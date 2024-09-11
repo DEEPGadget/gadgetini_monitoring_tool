@@ -2,19 +2,18 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div class="bg-gradient-to-r from-cyan-500 to-blue-500 bg-cover bg-center min-h-screen flex flex-col items-center justify-center">
+    <div class="bg-gradient-to-r from-cyan-500 to-blue-500 min-h-screen flex flex-col items-center justify-center">
       <main className="flex flex-col sm:flex-row items-center justify-center gap-10  p-8 rounded-lg shadow-md">
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center p-4">
           <Image
             src="/logos/dg_symbol_white.png"
             alt="Company Logo"
-            width={300}
-            height={300}
+            width={250}
+            height={250}
             priority
           />
         </div>
         <div className="flex flex-col items-center sm:items-start gap-6">
-          {" "}
           <input
             type="text"
             placeholder="Username"
