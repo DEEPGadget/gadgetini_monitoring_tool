@@ -1,6 +1,8 @@
 import Image from "next/image";
 
-export default function Register() {
+//TODO AuthCheck
+
+export default function Logine() {
   return (
     <div class="">
       <main className=""></main>
