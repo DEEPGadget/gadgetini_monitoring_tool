@@ -1,20 +1,33 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DocumentAddIcon, CogIcon } from "@heroicons/react/solid";
-import IPRegister from "../components/ipregesiter"; // IP Register 컴포넌트 임포트
-import DisplayControl from "../components/displaycontrol"; // Display Control 컴포넌트 임포트
+import IPRegister from "../components/ipregesiter";
+import DisplayControl from "../components/displaycontrol";
 
 export default function Auth() {
   const [activeMenu, setActiveMenu] = useState("IP Register");
+  const [username, setUsername] = useState("");
 
-  // 활성화된 메뉴에 따라 해당 컴포넌트를 렌더링하는 함수
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const response = await fetch("/api/username");
+        const data = await response.json();
+        setUsername(data.username);
+      } catch (error) {
+        console.error("Failed to fetch username:", error);
+      }
+    }
+
+    fetchUsername();
+  }, []);
+
   const renderComponent = () => {
     switch (activeMenu) {
       case "IP Register":
-        return <IPRegister />; // IP Register 컴포넌트를 렌더링
+        return <IPRegister />;
       case "Display Control":
-        return <DisplayControl />; // Display Control 컴포넌트를 렌더링
+        return <DisplayControl />;
       default:
         return <div>Select a menu</div>;
     }
@@ -23,7 +36,9 @@ export default function Auth() {
   return (
     <div className="h-screen flex flex-col">
       <header className="flex items-center justify-between p-4 bg-gray-200">
-        <h1>Username</h1>
+        <h1 className="text-gray-800 font-bold text-lg">
+          {username ? `${username}` : "Loading..."}
+        </h1>
         <div>Current Menu: {activeMenu}</div>
       </header>
       <div className="flex flex-1">
