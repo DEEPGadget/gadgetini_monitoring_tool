@@ -2,17 +2,19 @@
 
 import React, { useState } from "react";
 import { DocumentAddIcon, CogIcon } from "@heroicons/react/solid";
-import Image from "next/image";
+import IPRegister from "../components/ipregesiter"; // IP Register 컴포넌트 임포트
+import DisplayControl from "../components/displaycontrol"; // Display Control 컴포넌트 임포트
 
 export default function Auth() {
   const [activeMenu, setActiveMenu] = useState("IP Register");
 
+  // 활성화된 메뉴에 따라 해당 컴포넌트를 렌더링하는 함수
   const renderComponent = () => {
     switch (activeMenu) {
       case "IP Register":
-        return <div>IP Register Component</div>;
+        return <IPRegister />; // IP Register 컴포넌트를 렌더링
       case "Display Control":
-        return <div>Display Control Component</div>;
+        return <DisplayControl />; // Display Control 컴포넌트를 렌더링
       default:
         return <div>Select a menu</div>;
     }
@@ -26,7 +28,6 @@ export default function Auth() {
       </header>
       <div className="flex flex-1">
         <aside className="w-1/5 p-4 bg-gray-100">
-          {" "}
           <ul>
             <li
               className={`cursor-pointer p-2 ${
