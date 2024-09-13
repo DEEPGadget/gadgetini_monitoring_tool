@@ -115,8 +115,8 @@ export default function IPRegister() {
                   <Image
                     src="/icons/terminal.png"
                     alt="SSH"
-                    width={16}
-                    height={16}
+                    width={24}
+                    height={24}
                     className="inline-block mr-1"
                   />
                   SSH
@@ -125,9 +125,9 @@ export default function IPRegister() {
                   <Image
                     src="/icons/grafana.png"
                     alt="Grafana"
-                    width={16}
-                    height={16}
-                    className="inline-block ml-1"
+                    width={20}
+                    height={20}
+                    className="inline-block mx-1"
                   />
                   Grafana
                 </th>
@@ -150,19 +150,19 @@ export default function IPRegister() {
                     {node.description}
                   </td>
                   <td className="border border-gray-300 w-1/16">
-                    <button className="flex items-center bg-blue-500 text-white p-1 rounded">
+                    <button className="flex items-center bg-blue-500 text-white p-1 rounded mx-2 my-1">
                       <FaCheck className="mr-1" /> Connect
                     </button>
                   </td>
                   <td className="border border-gray-300 w-1/16">
-                    <button className="flex items-center bg-green-500 text-white p-1 rounded">
+                    <button className="flex items-center bg-green-500 text-white p-1 rounded mx-2 my-1">
                       <FaExternalLinkAlt className="mr-1" /> Connect
                     </button>
                   </td>
                   <td className="border border-gray-300 w-1/16">
                     <button
                       onClick={() => handleDelete(index)}
-                      className="flex items-center bg-red-500 text-white p-1 rounded"
+                      className="flex items-center bg-red-500 text-white p-1 rounded mx-2 my-1"
                     >
                       <FaTimes className="mr-1" /> Delete
                     </button>

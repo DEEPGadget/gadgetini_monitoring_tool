@@ -42,7 +42,7 @@ export default function Auth() {
         <div>Current Menu: {activeMenu}</div>
       </header>
       <div className="flex flex-1">
-        <aside className="w-1/5 p-4 bg-gray-100">
+        <aside className="w-1/10 p-4 bg-gray-100">
           <ul>
             <li
               className={`cursor-pointer p-2 ${
