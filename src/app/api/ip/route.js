@@ -8,6 +8,27 @@ const dbConfig = {
   database: "gadgetini",
 };
 
+export async function GET(request) {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows] = await connection.execute(
+      "SELECT username, ipaddress, alias, description FROM iplists"
+    );
+    await connection.end();
+
+    return new Response(JSON.stringify(rows), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    return new Response(JSON.stringify({ error: "Database error." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
 export async function POST(request) {
   try {
     const { username, ipaddress, password, alias, description } =

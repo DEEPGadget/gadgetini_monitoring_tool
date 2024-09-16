@@ -27,6 +27,7 @@ export default function Auth() {
     async function fetchIPList() {
       try {
         const response = await fetch("/api/ip");
+        if (!response.ok) throw new Error("Network response was not ok.");
         const data = await response.json();
         setNodes(data);
       } catch (error) {
@@ -35,7 +36,7 @@ export default function Auth() {
     }
 
     fetchIPList();
-  }, [nodes]);
+  }, []);
 
   const renderComponent = () => {
     switch (activeMenu) {

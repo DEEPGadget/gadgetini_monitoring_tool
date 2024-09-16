@@ -148,7 +148,7 @@ export default function IPRegister({ nodelist }) {
               </tr>
             </thead>
             <tbody>
-              {nodes.map((node, index) => (
+              {nodelist.map((node, index) => (
                 <tr
                   key={index}
                   className="text-center border-t border-gray-300"
