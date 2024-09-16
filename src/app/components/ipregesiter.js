@@ -5,7 +5,7 @@ import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 
-export default function IPRegister() {
+export default function IPRegister({ nodes }) {
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",

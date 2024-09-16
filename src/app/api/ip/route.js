@@ -1,5 +1,3 @@
-import os from "os";
-
 export async function GET(request) {
   const username = os.userInfo().username;
 

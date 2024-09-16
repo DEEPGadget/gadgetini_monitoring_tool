@@ -23,12 +23,26 @@ export default function Auth() {
     fetchUsername();
   }, []);
 
+  useEffect(() => {
+    async function fetchIPList() {
+      try {
+        const response = await fetch("/api/ip");
+        const data = await response.json();
+        setNodes(data);
+      } catch (error) {
+        console.error("Failed to fetch iplist:", error);
+      }
+    }
+
+    fetchIPList();
+  }, [nodes]);
+
   const renderComponent = () => {
     switch (activeMenu) {
       case "IP Register":
-        return <IPRegister />;
+        return <IPRegister nodes={nodes} />;
       case "Display Control":
-        return <DisplayControl />;
+        return <DisplayControl nodes={nodes} />;
       default:
         return <div>Select a menu</div>;
     }
@@ -40,7 +54,7 @@ export default function Auth() {
         <h1 className="text-gray-800 font-bold text-lg">
           {username ? `${username}` : "Loading..."}
         </h1>
-        <div>Current Menu: {activeMenu}</div>
+        <div>{activeMenu}</div>
       </header>
       <div className="flex flex-1">
         <aside className="w-1/10 p-4 bg-gray-100">

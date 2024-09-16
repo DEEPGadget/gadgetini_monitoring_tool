@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ArrowUpIcon, ArrowRightIcon, CheckIcon } from "@heroicons/react/solid";
 
-export default function DisplayControl() {
+export default function DisplayControl({ nodes }) {
   // State to manage the on/off status of each info item
   const [status, setStatus] = useState({
     cpu: false,
