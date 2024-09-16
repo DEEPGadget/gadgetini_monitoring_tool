@@ -110,7 +110,7 @@ export default function DisplayControl() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex items-center">
+        <div className="mt-6 flex justify-end">
           <input
             type="number"
             value={rotation}
