@@ -40,9 +40,9 @@ export default function Auth() {
   const renderComponent = () => {
     switch (activeMenu) {
       case "IP Register":
-        return <IPRegister nodes={nodes} />;
+        return <IPRegister nodelist={nodes} />;
       case "Display Control":
-        return <DisplayControl nodes={nodes} />;
+        return <DisplayControl nodelist={nodes} />;
       default:
         return <div>Select a menu</div>;
     }

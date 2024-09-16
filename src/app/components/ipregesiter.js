@@ -5,7 +5,7 @@ import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 
-export default function IPRegister({ nodes }) {
+export default function IPRegister({ nodelist }) {
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",
@@ -23,8 +23,21 @@ export default function IPRegister({ nodes }) {
 
   const handleRegister = async () => {
     try {
-      const { username, ipaddress, password, alias, description } = formData;
-      setNodes([...nodes, { username, ipaddress, alias, description }]);
+      const response = await fetch("/api/ip", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
+
+      const result = await response.json();
+      console.log(result.message);
+
       // 필드 초기화
       setFormData({
         username: "",
