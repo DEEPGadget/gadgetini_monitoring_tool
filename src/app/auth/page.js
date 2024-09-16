@@ -7,6 +7,7 @@ import DisplayControl from "../components/displaycontrol";
 export default function Auth() {
   const [activeMenu, setActiveMenu] = useState("IP Register");
   const [username, setUsername] = useState("");
+  const [nodes, setNodes] = useState([]);
 
   useEffect(() => {
     async function fetchUsername() {
