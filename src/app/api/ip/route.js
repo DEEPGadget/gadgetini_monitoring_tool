@@ -66,3 +66,34 @@ export async function POST(request) {
     });
   }
 }
+
+export async function DELETE(request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return new Response(JSON.stringify({ error: "ID is required." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+    await connection.execute("DELETE FROM iplists WHERE id = ?", [id]);
+    await connection.end();
+
+    return new Response(
+      JSON.stringify({ message: "Data deleted successfully!" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Database error:", error);
+    return new Response(JSON.stringify({ error: "Database error." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}

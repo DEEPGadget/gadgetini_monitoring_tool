@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 
 export default function IPRegister({ nodelist }) {
+  const [nodes, setNodes] = useState([]);
+  useEffect(() => {
+    console.log(nodelist);
+    console.log(nodes);
+  }, [nodes]);
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",
@@ -13,8 +18,6 @@ export default function IPRegister({ nodelist }) {
     alias: "",
     description: "",
   });
-
-  const [nodes, setNodes] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,7 +40,7 @@ export default function IPRegister({ nodelist }) {
 
       const result = await response.json();
       console.log(result.message);
-
+      setNodes([...nodes, formData]); // 배열 업데이트
       // 필드 초기화
       setFormData({
         username: "",
@@ -51,10 +54,27 @@ export default function IPRegister({ nodelist }) {
     }
   };
 
-  // 삭제 버튼 클릭 시 처리
-  const handleDelete = (index) => {
-    const updatedNodes = nodes.filter((_, i) => i !== index);
-    setNodes(updatedNodes);
+  // TODO
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch("/api/ip", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
+
+      const result = await response.json();
+      console.log(result.message);
+      setNodes(nodes.filter((node) => node.id !== id));
+    } catch (error) {
+      console.error("삭제 오류:", error);
+    }
   };
 
   return (
@@ -123,7 +143,7 @@ export default function IPRegister({ nodelist }) {
                 <th className="py-2 w-1/6 border border-gray-300">Alias</th>
                 <th className="py-2 w-1/2 border border-gray-300">
                   Description
-                </th>{" "}
+                </th>
                 <th className="py-2 w-1/16 border border-gray-300">
                   <Image
                     src="/icons/terminal.png"
