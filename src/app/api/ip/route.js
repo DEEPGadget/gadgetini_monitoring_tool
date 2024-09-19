@@ -3,8 +3,7 @@ import mysql from "mysql2/promise";
 // MariaDB 연결 설정
 const dbConfig = {
   host: "localhost",
-  user: "yjeon",
-  password: "gadgetini",
+  user: "root",
   database: "gadgetini",
 };
 
