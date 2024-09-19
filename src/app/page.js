@@ -7,9 +7,11 @@ import Image from "next/image";
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/auth", {
         method: "POST",
@@ -21,13 +23,15 @@ export default function Home() {
       const data = await res.json();
 
       if (data.success) {
-        router.push("/auth"); // 성공 시 페이지 이동
+        router.push("/auth");
       } else {
         alert("Login failed: " + data.message);
       }
     } catch (error) {
       console.error("Login error:", error);
       alert("An error occurred during login.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,10 +63,15 @@ export default function Home() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
-            className="w-full sm:w-80 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full sm:w-80 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 flex justify-center items-center"
             onClick={handleLogin}
+            disabled={loading}
           >
-            Login
+            {loading ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+            ) : (
+              "Login"
+            )}
           </button>
         </div>
       </main>
