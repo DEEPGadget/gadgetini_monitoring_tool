@@ -23,6 +23,7 @@ export default function Home() {
       const data = await res.json();
 
       if (data.success) {
+        localStorage.setItem("isLoggedIn", "true");
         router.push("/auth");
       } else {
         alert("Login failed: " + data.message);

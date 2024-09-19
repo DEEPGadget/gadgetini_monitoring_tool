@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DocumentAddIcon, CogIcon } from "@heroicons/react/solid";
 import IPRegister from "../components/ipregesiter";
 import DisplayControl from "../components/displaycontrol";
@@ -8,6 +9,15 @@ export default function Auth() {
   const [activeMenu, setActiveMenu] = useState("IP Register");
   const [username, setUsername] = useState("");
   const [nodes, setNodes] = useState([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+    if (!isLoggedIn) {
+      router.push("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     async function fetchUsername() {
