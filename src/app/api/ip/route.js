@@ -68,18 +68,34 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    const { id } = await request.json();
+    const { username, ipaddress } = await request.json();
 
-    if (!id) {
-      return new Response(JSON.stringify({ error: "ID is required." }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+    if (!username || !ipaddress) {
+      return new Response(
+        JSON.stringify({ error: "Username and IP address are required." }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     const connection = await mysql.createConnection(dbConfig);
-    await connection.execute("DELETE FROM iplists WHERE id = ?", [id]);
+    const [result] = await connection.execute(
+      "DELETE FROM iplists WHERE username = ? AND ipaddress = ?",
+      [username, ipaddress]
+    );
     await connection.end();
+
+    if (result.affectedRows === 0) {
+      return new Response(
+        JSON.stringify({ message: "No record found to delete." }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ message: "Data deleted successfully!" }),

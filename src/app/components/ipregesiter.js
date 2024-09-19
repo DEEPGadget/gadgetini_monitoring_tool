@@ -6,11 +6,6 @@ import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 
 export default function IPRegister({ nodelist }) {
-  const [nodes, setNodes] = useState([]);
-  useEffect(() => {
-    console.log(nodelist);
-    console.log(nodes);
-  }, [nodes]);
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",
@@ -55,14 +50,14 @@ export default function IPRegister({ nodelist }) {
   };
 
   // TODO
-  const handleDelete = async (id) => {
+  const handleDelete = async (username, ipaddress) => {
     try {
       const response = await fetch("/api/ip", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ username, ipaddress }),
       });
 
       if (!response.ok) {
@@ -71,7 +66,13 @@ export default function IPRegister({ nodelist }) {
 
       const result = await response.json();
       console.log(result.message);
-      setNodes(nodes.filter((node) => node.id !== id));
+
+      // 성공적으로 삭제되면 노드 리스트에서 해당 항목 제거
+      setNodes(
+        nodes.filter(
+          (node) => node.username !== username || node.ipaddress !== ipaddress
+        )
+      );
     } catch (error) {
       console.error("삭제 오류:", error);
     }
@@ -194,7 +195,9 @@ export default function IPRegister({ nodelist }) {
                   </td>
                   <td className="border border-gray-300 w-1/16">
                     <button
-                      onClick={() => handleDelete(index)}
+                      onClick={() =>
+                        handleDelete(node.username, node.ipaddress)
+                      }
                       className="flex items-center bg-red-500 text-white p-1 rounded mx-2 my-1"
                     >
                       <FaTimes className="mr-1" /> Delete
