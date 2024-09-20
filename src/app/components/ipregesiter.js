@@ -5,6 +5,7 @@ import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 import { fetchIPList } from "../utils/fetchIPList";
+import LoadingSpinner from "../utils/LoadingSpinner";
 
 export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
@@ -15,7 +16,7 @@ export default function IPRegister() {
     alias: "",
     description: "",
   });
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     loadIPList();
   }, []);
@@ -30,6 +31,7 @@ export default function IPRegister() {
   };
 
   const handleRegister = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/ip", {
         method: "POST",
@@ -39,11 +41,12 @@ export default function IPRegister() {
         body: JSON.stringify(formData),
       });
 
+      const result = await response.json();
       if (!response.ok) {
+        alert(result.error || "Something went wrong during registration.");
         throw new Error("Network response was not ok.");
       }
 
-      const result = await response.json();
       console.log(result.message);
       await loadIPList();
       setFormData({
@@ -55,6 +58,8 @@ export default function IPRegister() {
       });
     } catch (error) {
       console.error("등록 오류:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,9 +134,14 @@ export default function IPRegister() {
           <button
             onClick={handleRegister}
             className="flex items-center bg-green-500 text-white p-2 rounded"
+            disabled={loading} // 로딩 중 버튼 비활성화
           >
-            <PlusCircleIcon className="w-5 h-5 mr-1" />
-            Register
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <PlusCircleIcon className="w-5 h-5 mr-1" />
+            )}
+            {loading ? null : "Register"}
           </button>
         </div>
       </div>
