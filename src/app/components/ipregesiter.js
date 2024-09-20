@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
@@ -10,18 +10,19 @@ import LoadingSpinner from "../utils/LoadingSpinner";
 export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
   const [localIP, setLocalIP] = useState("localhost");
-  const [formData, setFormData] = useState({
-    username: "",
-    ipaddress: "",
-    password: "",
-    alias: "",
-    description: "",
-  });
   const [loading, setLoading] = useState(false);
+
+  const usernameRef = useRef();
+  const ipaddressRef = useRef();
+  const passwordRef = useRef();
+  const aliasRef = useRef();
+  const descriptionRef = useRef();
+
   useEffect(() => {
     loadIPList();
     fetchLocalIP();
   }, []);
+
   const loadIPList = async () => {
     const data = await fetchIPList();
     setNodelist(data);
@@ -36,14 +37,16 @@ export default function IPRegister() {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handleRegister = async () => {
     setLoading(true);
     try {
+      const formData = {
+        username: usernameRef.current.value,
+        ipaddress: ipaddressRef.current.value,
+        password: passwordRef.current.value,
+        alias: aliasRef.current.value,
+        description: descriptionRef.current.value,
+      };
       const response = await fetch("/api/ip", {
         method: "POST",
         headers: {
@@ -60,13 +63,12 @@ export default function IPRegister() {
 
       console.log(result.message);
       await loadIPList();
-      setFormData({
-        username: "",
-        ipaddress: "",
-        password: "",
-        alias: "",
-        description: "",
-      });
+
+      usernameRef.current.value = "";
+      ipaddressRef.current.value = "";
+      passwordRef.current.value = "";
+      aliasRef.current.value = "";
+      descriptionRef.current.value = "";
     } catch (error) {
       console.error("등록 오류:", error);
     } finally {
@@ -104,48 +106,38 @@ export default function IPRegister() {
         <div className="flex gap-4 mb-4">
           <input
             type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleInputChange}
+            ref={usernameRef}
             placeholder="Username"
             className="border p-2"
           />
           <input
             type="text"
-            name="ipaddress"
-            value={formData.ipaddress}
-            onChange={handleInputChange}
+            ref={ipaddressRef}
             placeholder="IP Address"
             className="border p-2"
           />
           <input
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
+            ref={passwordRef}
             placeholder="Password"
             className="border p-2"
           />
           <input
             type="text"
-            name="alias"
-            value={formData.alias}
-            onChange={handleInputChange}
+            ref={aliasRef}
             placeholder="Alias"
             className="border p-2"
           />
           <input
             type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
+            ref={descriptionRef}
             placeholder="Description"
             className="border p-2"
           />
           <button
             onClick={handleRegister}
             className="flex items-center bg-green-500 text-white p-2 rounded"
-            disabled={loading} // 로딩 중 버튼 비활성화
+            disabled={loading}
           >
             {loading ? (
               <LoadingSpinner />
