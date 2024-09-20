@@ -8,7 +8,6 @@ import DisplayControl from "../components/displaycontrol";
 export default function Auth() {
   const [activeMenu, setActiveMenu] = useState("IP Register");
   const [username, setUsername] = useState("");
-  const [nodes, setNodes] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,27 +32,12 @@ export default function Auth() {
     fetchUsername();
   }, []);
 
-  useEffect(() => {
-    async function fetchIPList() {
-      try {
-        const response = await fetch("/api/ip");
-        if (!response.ok) throw new Error("Network response was not ok.");
-        const data = await response.json();
-        setNodes(data);
-      } catch (error) {
-        console.error("Failed to fetch iplist:", error);
-      }
-    }
-
-    fetchIPList();
-  }, []);
-
   const renderComponent = () => {
     switch (activeMenu) {
       case "IP Register":
-        return <IPRegister nodelist={nodes} />;
+        return <IPRegister />;
       case "Display Control":
-        return <DisplayControl nodelist={nodes} />;
+        return <DisplayControl />;
       default:
         return <div>Select a menu</div>;
     }

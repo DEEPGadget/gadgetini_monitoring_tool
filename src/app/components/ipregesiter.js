@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import Image from "next/image";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
+import { fetchIPList } from "../utils/fetchIPList";
 
-export default function IPRegister({ nodelist }) {
+export default function IPRegister() {
+  const [nodelist, setNodelist] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",
@@ -13,6 +15,14 @@ export default function IPRegister({ nodelist }) {
     alias: "",
     description: "",
   });
+
+  useEffect(() => {
+    loadIPList();
+  }, []);
+  const loadIPList = async () => {
+    const data = await fetchIPList();
+    setNodelist(data);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,8 +45,7 @@ export default function IPRegister({ nodelist }) {
 
       const result = await response.json();
       console.log(result.message);
-      setNodes([...nodes, formData]); // 배열 업데이트
-      // 필드 초기화
+      await loadIPList();
       setFormData({
         username: "",
         ipaddress: "",
@@ -49,7 +58,6 @@ export default function IPRegister({ nodelist }) {
     }
   };
 
-  // TODO
   const handleDelete = async (username, ipaddress) => {
     try {
       const response = await fetch("/api/ip", {
@@ -67,12 +75,7 @@ export default function IPRegister({ nodelist }) {
       const result = await response.json();
       console.log(result.message);
 
-      // 성공적으로 삭제되면 노드 리스트에서 해당 항목 제거
-      setNodes(
-        nodes.filter(
-          (node) => node.username !== username || node.ipaddress !== ipaddress
-        )
-      );
+      await loadIPList();
     } catch (error) {
       console.error("삭제 오류:", error);
     }
@@ -169,9 +172,9 @@ export default function IPRegister({ nodelist }) {
               </tr>
             </thead>
             <tbody>
-              {nodelist.map((node, index) => (
+              {nodelist.map((node) => (
                 <tr
-                  key={index}
+                  key={node.ipaddress}
                   className="text-center border-t border-gray-300"
                 >
                   <td className="truncate border border-gray-300">
