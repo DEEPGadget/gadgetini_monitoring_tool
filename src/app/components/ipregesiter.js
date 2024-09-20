@@ -9,6 +9,7 @@ import LoadingSpinner from "../utils/LoadingSpinner";
 
 export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
+  const [localIP, setLocalIP] = useState("localhost");
   const [formData, setFormData] = useState({
     username: "",
     ipaddress: "",
@@ -19,10 +20,20 @@ export default function IPRegister() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     loadIPList();
+    fetchLocalIP();
   }, []);
   const loadIPList = async () => {
     const data = await fetchIPList();
     setNodelist(data);
+  };
+  const fetchLocalIP = async () => {
+    try {
+      const response = await fetch("/localhost");
+      const data = await response.json();
+      setLocalIP(data.ipv4);
+    } catch (error) {
+      console.error("Failed to fetch local IP:", error);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -197,14 +208,22 @@ export default function IPRegister() {
                     {node.description}
                   </td>
                   <td className="border border-gray-300 w-1/16">
-                    <button className="flex items-center bg-blue-500 text-white p-1 rounded mx-2 my-1">
+                    <a
+                      href={`http://${localIP}:2222/ssh/host/${node.ipaddress}`}
+                      target="_blank"
+                      className="flex items-center bg-blue-500 text-white p-1 rounded mx-2 my-1"
+                    >
                       <FaCheck className="mr-1" /> Connect
-                    </button>
+                    </a>
                   </td>
                   <td className="border border-gray-300 w-1/16">
-                    <button className="flex items-center bg-green-500 text-white p-1 rounded mx-2 my-1">
+                    <a
+                      href={`http://${node.ipaddress}:3000`}
+                      target="_blank"
+                      className="flex items-center bg-green-500 text-white p-1 rounded mx-2 my-1"
+                    >
                       <FaExternalLinkAlt className="mr-1" /> Connect
-                    </button>
+                    </a>
                   </td>
                   <td className="border border-gray-300 w-1/16">
                     <button
