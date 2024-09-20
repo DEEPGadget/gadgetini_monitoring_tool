@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import LoadingSpinner from "./utils/LoadingSpinner";
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -68,11 +69,7 @@ export default function Home() {
             onClick={handleLogin}
             disabled={loading}
           >
-            {loading ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
-            ) : (
-              "Login"
-            )}
+            {loading ? <LoadingSpinner /> : "Login"}
           </button>
         </div>
       </main>

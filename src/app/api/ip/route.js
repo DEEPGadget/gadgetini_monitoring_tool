@@ -1,6 +1,6 @@
 import mysql from "mysql2/promise";
+import { Client } from "ssh2";
 
-// MariaDB 연결 설정
 const dbConfig = {
   host: "localhost",
   user: "root",
@@ -33,9 +33,47 @@ export async function POST(request) {
     const { username, ipaddress, password, alias, description } =
       await request.json();
 
-    if (!username || !ipaddress || !password || !alias || !description) {
+    if (!username || !ipaddress || !password) {
       return new Response(
-        JSON.stringify({ error: "All fields are required." }),
+        JSON.stringify({
+          error: "Required missing : username, ipaddress or password.",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const sshConnect = (username, ipaddress, password) => {
+      return new Promise((resolve, reject) => {
+        const conn = new Client();
+        conn
+          .on("ready", () => {
+            console.log("SSH Connection Successful");
+            resolve(true);
+            conn.end();
+          })
+          .on("error", (err) => {
+            console.error("SSH Connection Failed:", err);
+            reject(err);
+          })
+          .connect({
+            host: ipaddress,
+            port: 22,
+            username: username,
+            password: password,
+          });
+      });
+    };
+
+    try {
+      await sshConnect(username, ipaddress, password);
+    } catch (sshError) {
+      return new Response(
+        JSON.stringify({
+          error: `SSH connection failed: ${sshError.message}`,
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
