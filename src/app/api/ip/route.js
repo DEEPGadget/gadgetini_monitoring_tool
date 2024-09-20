@@ -82,11 +82,28 @@ export async function POST(request) {
     }
 
     const connection = await mysql.createConnection(dbConfig);
-    await connection.execute(
-      "INSERT INTO iplists (username, ipaddress, password, alias, description) VALUES (?, ?, ?, ?, ?)",
-      [username, ipaddress, password, alias, description]
-    );
-    await connection.end();
+
+    try {
+      await connection.execute(
+        "INSERT INTO iplists (username, ipaddress, password, alias, description) VALUES (?, ?, ?, ?, ?)",
+        [username, ipaddress, password, alias, description]
+      );
+    } catch (dbError) {
+      if (dbError.code === "ER_DUP_ENTRY") {
+        return new Response(
+          JSON.stringify({
+            error: "Duplicate entry: username and IP address already exist.",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+      throw dbError;
+    } finally {
+      await connection.end();
+    }
 
     return new Response(
       JSON.stringify({ message: "Data inserted successfully!" }),
