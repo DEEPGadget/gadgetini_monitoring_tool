@@ -137,7 +137,7 @@ export default function IPRegister() {
             className="border p-2"
           />
           <button
-            onClick={() => handleRegister}
+            onClick={handleRegister}
             className="flex items-center bg-green-500 text-white p-2 rounded"
             disabled={loading}
           >
