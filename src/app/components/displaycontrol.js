@@ -72,33 +72,34 @@ export default function DisplayControl({ nodelist }) {
             </thead>
             <tbody>
               {Object.entries({
-                CPU: "Central Processing Unit - Handles all the instructions from programs.",
-                GPU: "Graphics Processing Unit - Manages and accelerates graphics rendering.",
-                PSU: "Power Supply Unit - Provides power to all components of the system.",
+                CPU: "Monitors CPU usage, clock speed, and temperature.",
+                GPU: "Monitors GPU memory usage, load, and temperature.",
+                PSU: "Monitors power supply health and voltage levels.",
                 network:
-                  "Network Interface - Connects the system to a network.",
-                sensors: "Various sensors - Monitors different system metrics.",
+                  "Monitors network bandwidth, latency, and packet loss.",
+                sensors:
+                  "Monitors internal temperature and humidity, water leakage detection, and coolant level",
               }).map(([key, description]) => (
                 <tr key={key} className="border-b border-gray-300 text-center">
                   <td className="py-2 border border-gray-300">
                     {key.charAt(0).toUpperCase() + key.slice(1)} Info
                   </td>
                   <td className="py-2 border border-gray-300">{description}</td>
-                  <td className="py-2 border border-gray-300">
+                  <td className="py-2 border border-gray-300 flex justify-center">
                     <button
                       onClick={() => toggleStatus(key)}
-                      className={`relative flex items-center justify-between w-20 h-8 rounded-full border-2 border-gray-400 transition-colors duration-300 ${
+                      className={`relative flex items-center w-20 h-8 rounded-full border-2 border-gray-400 transition-colors duration-300 ${
                         status[key] ? "bg-green-500" : "bg-red-500"
                       }`}
                     >
                       <span
-                        className={`absolute transition-transform duration-300 transform ${
-                          status[key] ? "translate-x-12" : "translate-x-1"
+                        className={`absolute left-1 transition-transform duration-300 transform ${
+                          status[key] ? "translate-x-11" : "translate-x-0"
                         } bg-white rounded-full w-6 h-6`}
                       />
                       <span
-                        className={`absolute text-white font-bold w-full text-center ${
-                          status[key] ? "left-2" : "right-2"
+                        className={`text-white font-bold transition-all duration-300 ${
+                          status[key] ? "ml-2" : "ml-10"
                         }`}
                       >
                         {status[key] ? "On" : "Off"}
