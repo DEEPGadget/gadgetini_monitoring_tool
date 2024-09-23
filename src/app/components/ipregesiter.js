@@ -27,11 +27,13 @@ export default function IPRegister() {
     const data = await fetchIPList();
     setNodelist(data);
   };
+
   const fetchLocalIP = async () => {
     try {
-      const response = await fetch("/localhost");
+      const response = await fetch("/api/localhostip");
       const data = await response.json();
       setLocalIP(data.ipv4);
+      console.log("Fetched local IP:", data.ipv4);
     } catch (error) {
       console.error("Failed to fetch local IP:", error);
     }
@@ -135,7 +137,7 @@ export default function IPRegister() {
             className="border p-2"
           />
           <button
-            onClick={handleRegister}
+            onClick={() => handleRegister}
             className="flex items-center bg-green-500 text-white p-2 rounded"
             disabled={loading}
           >
