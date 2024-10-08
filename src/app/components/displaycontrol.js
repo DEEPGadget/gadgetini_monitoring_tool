@@ -5,8 +5,10 @@ import { ArrowUpIcon, ArrowRightIcon, CheckIcon } from "@heroicons/react/solid";
 import LoadingSpinner from "../utils/LoadingSpinner";
 
 export default function DisplayControl({ nodelist }) {
-  const [loading, setLoading] = useState(false);
+  const [loadingVertical, setLoadingVertical] = useState(false);
+  const [loadingHorizontal, setLoadingHorizontal] = useState(false);
   const [success, setSuccess] = useState(false);
+
   // State to manage the on/off status of each info item
   const [status, setStatus] = useState({
     cpu: false,
@@ -16,31 +18,10 @@ export default function DisplayControl({ nodelist }) {
     sensors: false,
   });
 
-  // State for the rotation value
-  const [rotation, setRotation] = useState("");
-  const setHorizontal = () => {
-    setRotation("horizontal");
-    handleRotation("horizontal");
-  };
-  const setVertical = () => {
-    setRotation("vertical");
-    handleRotation("vertical");
-  };
-
-  // Function to toggle status
-  const toggleStatus = (key) => {
-    setStatus((prevStatus) => ({
-      ...prevStatus,
-      [key]: !prevStatus[key],
-    }));
-  };
-
-  // Function to handle apply button click
-  const handleRotation = async (rotationValue) => {
+  // Function to handle rotation API calls
+  const handleRotation = async (rotationValue, setLoading) => {
     setLoading(true);
-    const payload = {
-      rotation: rotationValue,
-    };
+    const payload = { rotation: rotationValue };
     try {
       const response = await fetch("/api/rotation-config", {
         method: "POST",
@@ -63,10 +44,25 @@ export default function DisplayControl({ nodelist }) {
     }
   };
 
+  // Separate handlers for Horizontal and Vertical buttons
+  const setHorizontal = () => {
+    handleRotation("horizontal", setLoadingHorizontal);
+  };
+  const setVertical = () => {
+    handleRotation("vertical", setLoadingVertical);
+  };
+
+  // Function to toggle status
+  const toggleStatus = (key) => {
+    setStatus((prevStatus) => ({
+      ...prevStatus,
+      [key]: !prevStatus[key],
+    }));
+  };
+
+  // Function to handle status apply button
   const handleApply = async () => {
-    const payload = {
-      status,
-    };
+    const payload = { status };
     try {
       const response = await fetch("/api/update-config", {
         method: "POST",
@@ -84,7 +80,6 @@ export default function DisplayControl({ nodelist }) {
     } catch (error) {
       console.error("Error applying config:", error);
     }
-    console.log("Mode applied:", rotation);
   };
 
   return (
@@ -95,10 +90,10 @@ export default function DisplayControl({ nodelist }) {
           <button
             onClick={setVertical}
             className="flex items-center bg-green-500 text-white p-2 rounded"
-            disabled={loading}
+            disabled={loadingVertical}
           >
-            {loading ? (
-              <LoadingSpinner /> // Show spinner when loading
+            {loadingVertical ? (
+              <LoadingSpinner /> // Show spinner when loading Vertical
             ) : (
               <>
                 <ArrowUpIcon className="w-5 h-5 mr-1" />
@@ -109,10 +104,10 @@ export default function DisplayControl({ nodelist }) {
           <button
             onClick={setHorizontal}
             className="flex items-center bg-green-500 text-white p-2 rounded"
-            disabled={loading}
+            disabled={loadingHorizontal}
           >
-            {loading ? (
-              <LoadingSpinner /> // Show spinner when loading
+            {loadingHorizontal ? (
+              <LoadingSpinner /> // Show spinner when loading Horizontal
             ) : (
               <>
                 <ArrowRightIcon className="w-5 h-5 mr-1" />
@@ -144,10 +139,8 @@ export default function DisplayControl({ nodelist }) {
                 CPU: "Monitors CPU usage, clock speed, and temperature.",
                 GPU: "Monitors GPU memory usage, load, and temperature.",
                 PSU: "Monitors power supply health and voltage levels.",
-                network:
-                  "Monitors network bandwidth, latency, and packet loss.",
-                sensors:
-                  "Monitors internal temperature and humidity, water leakage detection, and coolant level",
+                network: "Monitors network bandwidth, latency, and packet loss.",
+                sensors: "Monitors internal temperature and humidity, water leakage detection, and coolant level",
               }).map(([key, description]) => (
                 <tr key={key} className="border-b border-gray-300 text-center">
                   <td className="py-2 border border-gray-300">
@@ -181,13 +174,6 @@ export default function DisplayControl({ nodelist }) {
           </table>
         </div>
         <div className="mt-6 flex justify-end">
-          <input
-            type="number"
-            value={rotation}
-            onChange={(e) => setRotation(e.target.value)}
-            placeholder="Enter rotation value"
-            className="p-2 border rounded-l-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
           <button
             onClick={handleApply}
             className="flex items-center px-4 py-2 bg-green-500 text-white rounded-r-md border border-green-700 hover:bg-green-600"
