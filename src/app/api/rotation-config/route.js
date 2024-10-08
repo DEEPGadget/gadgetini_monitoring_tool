@@ -25,7 +25,7 @@ export async function POST(request) {
         conn
           .on("ready", () => {
             // Command to update only the orientation in config.ini
-            const command = `sed -i 's/^orientation=.*/orientation=${rotation}/' /home/yonsei/config.ini`;
+            const command = `sed -i 's/^orientation\\s*=.*/orientation=${rotation}/' ~/config.ini`;
             console.log("Running command on remote:", command);
             // Execute the command on the remote node
             conn.exec(command, (err) => {
