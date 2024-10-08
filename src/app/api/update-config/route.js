@@ -20,7 +20,13 @@ export async function POST(request) {
     );
     await connection.end();
 
-    const updateModes = (username, ipaddress, password, status) => {
+    const updateModes = (
+      username,
+      ipaddress,
+      password,
+      status,
+      rotationTime
+    ) => {
       return new Promise((resolve, reject) => {
         const conn = new Client();
         conn
@@ -42,6 +48,7 @@ export async function POST(request) {
         sed -i 's/^sensormode\\s*=\\s*.*/sensormode=${
           status.sensors ? "on" : "off"
         }/' ~/config.ini;
+        sed -i 's/^time\\s*=\\s*.*/time=${rotationTime}/' ~/config.ini;
       `;
 
             // Execute the command on the remote node
@@ -86,7 +93,8 @@ export async function POST(request) {
         .replace(
           /^sensormode\s*=\s*.*/m,
           `sensormode=${status.sensors ? "on" : "off"}`
-        );
+        )
+        .replace(/^time\s*=\s*.*/m, `time=${rotationTime}`);
 
       // Write the updated config file back to the file system
       await fs.promises.writeFile(configPath, config, "utf-8");
