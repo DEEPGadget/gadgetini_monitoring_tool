@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { ArrowUpIcon, ArrowRightIcon, CheckIcon } from "@heroicons/react/solid";
 
 export default function DisplayControl({ nodelist }) {
+
+  const [loading, setLoading] = useState(false);
+const [success, setSuccess] = useState(false);
   // State to manage the on/off status of each info item
   const [status, setStatus] = useState({
     cpu: false,
@@ -15,9 +18,14 @@ export default function DisplayControl({ nodelist }) {
 
   // State for the rotation value
   const [rotation, setRotation] = useState("");
-
-  const setHorizontal = () => {};
-  const setVertical = () => {};
+  const setHorizontal = () => {
+  setRotation("horizontal");
+  handleRotation("horizontal");
+};
+  const setVertical = () => {
+  setRotation("vertical");
+  handleRotation("vertical");
+};
 
   // Function to toggle status
   const toggleStatus = (key) => {
@@ -28,8 +36,55 @@ export default function DisplayControl({ nodelist }) {
   };
 
   // Function to handle apply button click
-  const handleApply = () => {
-    console.log("Rotation applied:", rotation);
+  const handleRotation = async (rotationValue) => {
+    setLoading(true);
+  const payload = {
+    rotation: rotationValue,
+  };
+  try {
+    const response = await fetch("/api/rotation-config", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      setSuccess(true);
+      console.log("Rotation updated successfully");
+    } else {
+      console.error("Failed to update rotation");
+    }
+  } catch (error) {
+    console.error("Error applying rotation:", error);
+  }finally {
+    setLoading(false);
+  }
+};
+
+  const handleApply = async () => {
+    const payload = {
+      status,
+    };
+    try {
+      const response = await fetch("/api/update-config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        console.log("Config updated successfully");
+      } else {
+        console.error("Failed to update config");
+      }
+    } catch (error) {
+      console.error("Error applying config:", error);
+    }
+    console.log("Mode applied:", rotation);
   };
 
   return (
@@ -40,16 +95,30 @@ export default function DisplayControl({ nodelist }) {
           <button
             onClick={setVertical}
             className="flex items-center bg-green-500 text-white p-2 rounded"
+            disabled={loading}          
           >
-            <ArrowUpIcon className="w-5 h-5 mr-1" />
-            Vertical
+            {loadingRotation ? (
+      <LoadingSpinner /> // Show spinner when loading
+    ) : (
+      <>
+        <ArrowUpIcon className="w-5 h-5 mr-1" />
+        Vertical
+      </>
+    )}
           </button>
           <button
             onClick={setHorizontal}
             className="flex items-center bg-green-500 text-white p-2 rounded"
+            disabled={loading}
           >
-            <ArrowRightIcon className="w-5 h-5 mr-1" />
-            Horizontal
+            {loadingRotation ? (
+      <LoadingSpinner /> // Show spinner when loading
+    ) : (
+      <>
+        <ArrowRightIcon className="w-5 h-5 mr-1" />
+        Horizontal
+      </>
+    )}
           </button>
         </div>
       </div>
