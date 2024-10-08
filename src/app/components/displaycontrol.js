@@ -7,6 +7,7 @@ import LoadingSpinner from "../utils/LoadingSpinner";
 export default function DisplayControl({ nodelist }) {
   const [loadingVertical, setLoadingVertical] = useState(false);
   const [loadingHorizontal, setLoadingHorizontal] = useState(false);
+  const [loadingApply, setLoadingApply] = useState(false);
   const [success, setSuccess] = useState(false);
 
   // State to manage the on/off status of each info item
@@ -62,6 +63,7 @@ export default function DisplayControl({ nodelist }) {
 
   // Function to handle status apply button
   const handleApply = async () => {
+    setLoadingApply(true);
     const payload = { status };
     try {
       const response = await fetch("/api/update-config", {
@@ -79,6 +81,8 @@ export default function DisplayControl({ nodelist }) {
       }
     } catch (error) {
       console.error("Error applying config:", error);
+    } finally {
+      setLoadingApply(false); 
     }
   };
 
@@ -89,7 +93,7 @@ export default function DisplayControl({ nodelist }) {
         <div className="flex gap-4 mb-4">
           <button
             onClick={setVertical}
-            className="flex items-center bg-green-500 text-white p-2 rounded"
+            className="flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all"
             disabled={loadingVertical}
           >
             {loadingVertical ? (
@@ -103,7 +107,7 @@ export default function DisplayControl({ nodelist }) {
           </button>
           <button
             onClick={setHorizontal}
-            className="flex items-center bg-green-500 text-white p-2 rounded"
+            className="flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all"
             disabled={loadingHorizontal}
           >
             {loadingHorizontal ? (
@@ -176,7 +180,8 @@ export default function DisplayControl({ nodelist }) {
         <div className="mt-6 flex justify-end">
           <button
             onClick={handleApply}
-            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-r-md border border-green-700 hover:bg-green-600"
+            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+            disabled={loadingApply}
           >
             <CheckIcon className="w-5 h-5 mr-2" />
             Apply
