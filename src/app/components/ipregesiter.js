@@ -11,6 +11,7 @@ export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
   const [localIP, setLocalIP] = useState("localhost");
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
 
   const usernameRef = useRef();
   const ipaddressRef = useRef();
@@ -21,11 +22,23 @@ export default function IPRegister() {
   useEffect(() => {
     loadIPList();
     fetchLocalIP();
+    fetchUsername();
   }, []);
 
   const loadIPList = async () => {
     const data = await fetchIPList();
     setNodelist(data);
+  };
+
+  const fetchUsername = async () => {
+    try {
+      const response = await fetch("/api/username");
+      const data = await response.json();
+      setUsername(data.username);
+      console.log("Fetched username:", data.username);
+    } catch (error) {
+      console.error("Failed to fetch username:", error);
+    }
   };
 
   const fetchLocalIP = async () => {
@@ -156,14 +169,14 @@ export default function IPRegister() {
           <table className="min-w-full bg-white table-fixed border-separate border-spacing-0">
             <thead>
               <tr className="border-b-2 border-gray-400">
-                <th className="py-2 w-1/6 border border-gray-300">
+                <th className="py-2 w-1/5 border border-gray-300">
                   Username@IP
                 </th>
-                <th className="py-2 w-1/6 border border-gray-300">Alias</th>
-                <th className="py-2 w-1/2 border border-gray-300">
+                <th className="py-2 w-1/5 border border-gray-300">Alias</th>
+                <th className="py-2 w-2/5 border border-gray-300">
                   Description
                 </th>
-                <th className="py-2 w-1/16 border border-gray-300">
+                <th className="py-2 w-1/8 border border-gray-300 text-center">
                   <Image
                     src="/icons/terminal.png"
                     alt="SSH"
@@ -173,7 +186,7 @@ export default function IPRegister() {
                   />
                   SSH
                 </th>
-                <th className="py-2 w-1/16 border border-gray-300">
+                <th className="py-2 w-1/8 border border-gray-300 text-center">
                   <Image
                     src="/icons/grafana.png"
                     alt="Grafana"
@@ -183,10 +196,32 @@ export default function IPRegister() {
                   />
                   Grafana
                 </th>
-                <th className="py-2 w-1/16 border border-gray-300">Delete</th>
+                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                  Delete
+                </th>
               </tr>
             </thead>
             <tbody>
+              <tr className="text-center border-t border-gray-300">
+                <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">{`${username}@${localIP}`}</td>
+                <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">
+                  center node
+                </td>
+                <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">
+                  This center node manages leaf nodes
+                </td>
+                <td className="border border-gray-300 w-1/8 text-center"></td>
+                <td className="border border-gray-300 w-1/8 text-center">
+                  <a
+                    href={`http://${localIP}:3000`}
+                    target="_blank"
+                    className="flex justify-center items-center bg-green-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-green-600 transition-all mx-auto"
+                  >
+                    <FaExternalLinkAlt className="mr-1" /> Connect
+                  </a>
+                </td>
+                <td className="border border-gray-300 w-1/8 text-center"></td>
+              </tr>
               {nodelist.map((node) => (
                 <tr
                   key={node.ipaddress}
@@ -201,30 +236,30 @@ export default function IPRegister() {
                   <td className="truncate border border-gray-300">
                     {node.description}
                   </td>
-                  <td className="border border-gray-300 w-1/16">
+                  <td className="border border-gray-300 w-1/8 text-center">
                     <a
                       href={`http://${localIP}:2222/ssh/host/${node.ipaddress}`}
                       target="_blank"
-                      className="flex items-center bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition-all mx-2 my-1"
+                      className="flex justify-center items-center bg-blue-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-blue-600 transition-all mx-auto"
                     >
                       <FaCheck className="mr-1" /> Connect
                     </a>
                   </td>
-                  <td className="border border-gray-300 w-1/16">
+                  <td className="border border-gray-300 w-1/8 text-center">
                     <a
                       href={`http://${node.ipaddress}:3000`}
                       target="_blank"
-                      className="flex items-center bg-green-500 text-white px-4 py-1 rounded-lg hover:bg-green-600 transition-all mx-2 my-1"
+                      className="flex justify-center items-center bg-green-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-green-600 transition-all mx-auto"
                     >
                       <FaExternalLinkAlt className="mr-1" /> Connect
                     </a>
                   </td>
-                  <td className="border border-gray-300 w-1/16">
+                  <td className="border border-gray-300 w-1/8 text-center">
                     <button
                       onClick={() =>
                         handleDelete(node.username, node.ipaddress)
                       }
-                       className="flex items-center bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600 transition-all mx-2 my-1"
+                      className="flex justify-center items-center bg-red-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-red-600 transition-all mx-auto"
                     >
                       <FaTimes className="mr-1" /> Delete
                     </button>
