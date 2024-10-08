@@ -138,7 +138,7 @@ export default function IPRegister() {
           />
           <button
             onClick={handleRegister}
-            className="flex items-center bg-green-500 text-white p-2 rounded"
+            className="flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all"
             disabled={loading}
           >
             {loading ? (
@@ -205,7 +205,7 @@ export default function IPRegister() {
                     <a
                       href={`http://${localIP}:2222/ssh/host/${node.ipaddress}`}
                       target="_blank"
-                      className="flex items-center bg-blue-500 text-white p-1 rounded mx-2 my-1"
+                      className="flex items-center bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition-all mx-2 my-1"
                     >
                       <FaCheck className="mr-1" /> Connect
                     </a>
@@ -214,7 +214,7 @@ export default function IPRegister() {
                     <a
                       href={`http://${node.ipaddress}:3000`}
                       target="_blank"
-                      className="flex items-center bg-green-500 text-white p-1 rounded mx-2 my-1"
+                      className="flex items-center bg-green-500 text-white px-4 py-1 rounded-lg hover:bg-green-600 transition-all mx-2 my-1"
                     >
                       <FaExternalLinkAlt className="mr-1" /> Connect
                     </a>
@@ -224,7 +224,7 @@ export default function IPRegister() {
                       onClick={() =>
                         handleDelete(node.username, node.ipaddress)
                       }
-                      className="flex items-center bg-red-500 text-white p-1 rounded mx-2 my-1"
+                       className="flex items-center bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600 transition-all mx-2 my-1"
                     >
                       <FaTimes className="mr-1" /> Delete
                     </button>
