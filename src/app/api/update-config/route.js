@@ -13,38 +13,53 @@ export async function POST(request) {
 
     // Fetch node IP addresses and credentials from the database
     const connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute("SELECT username, ipaddress, password FROM iplists");
+    const [rows] = await connection.execute(
+      "SELECT username, ipaddress, password FROM iplists"
+    );
     await connection.end();
 
     const updateModes = (username, ipaddress, password, status) => {
       return new Promise((resolve, reject) => {
         const conn = new Client();
-        conn.on("ready", () => {
-          // Command to update modes (cpu, gpu, psu, network, sensors) in config.ini
-          const command = `sed -i 's/^cpumode=.*/cpumode=${status.cpu ? 'on' : 'off'}/' ~/config.ini && \
-                           sed -i 's/^gpumode=.*/gpumode=${status.gpu ? 'on' : 'off'}/' ~/config.ini && \
-                           sed -i 's/^psumode=.*/psumode=${status.psu ? 'on' : 'off'}/' ~/config.ini && \
-                           sed -i 's/^networkmode=.*/networkmode=${status.network ? 'on' : 'off'}/' ~/config.ini && \
-                           sed -i 's/^sensormode=.*/sensormode=${status.sensors ? 'on' : 'off'}/' ~/config.ini`;
+        conn
+          .on("ready", () => {
+            // Command to update modes (cpu, gpu, psu, network, sensors) in config.ini
+            const command = `sed -i 's/^cpumode=.*/cpumode=${
+              status.cpu ? "on" : "off"
+            }/' ~/config.ini && \
+                           sed -i 's/^gpumode=.*/gpumode=${
+                             status.gpu ? "on" : "off"
+                           }/' ~/config.ini && \
+                           sed -i 's/^psumode=.*/psumode=${
+                             status.psu ? "on" : "off"
+                           }/' ~/config.ini && \
+                           sed -i 's/^networkmode=.*/networkmode=${
+                             status.network ? "on" : "off"
+                           }/' ~/config.ini && \
+                           sed -i 's/^sensormode=.*/sensormode=${
+                             status.sensors ? "on" : "off"
+                           }/' ~/config.ini`;
 
-          // Execute the command on the remote node
-          conn.exec(command, (err) => {
-            if (err) {
-              reject(err);
-              conn.end();
-            } else {
-              resolve(true);
-              conn.end();
-            }
+            // Execute the command on the remote node
+            conn.exec(command, (err) => {
+              if (err) {
+                reject(err);
+                conn.end();
+              } else {
+                resolve(true);
+                conn.end();
+              }
+            });
+          })
+          .on("error", (err) => {
+            reject(err);
+          })
+          .connect({
+            host: ipaddress,
+            port: 22,
+            username: username,
+            password: password,
           });
-        }).on("error", (err) => {
-          reject(err);
-        }).connect({
-          host: ipaddress,
-          port: 22,
-          username: username,
-          password: password,
-        });
       });
     };
 
@@ -53,10 +68,13 @@ export async function POST(request) {
       await updateModes(node.username, node.ipaddress, node.password, status);
     }
 
-    return new Response(JSON.stringify({ message: "Modes updated on all nodes!" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ message: "Modes updated on all nodes!" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("Error updating modes:", error);
     return new Response(JSON.stringify({ error: "Failed to update modes." }), {
