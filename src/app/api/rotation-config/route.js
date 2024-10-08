@@ -1,5 +1,7 @@
 import { Client } from "ssh2";
 import mysql from "mysql2/promise";
+import fs from "fs";
+import path from "path";
 
 const dbConfig = {
   host: "localhost",
@@ -49,6 +51,25 @@ export async function POST(request) {
           });
       });
     };
+
+    const updateLocalRotation = async (rotation) => {
+      const homeDir = require("os").homedir(); // Get home directory
+      const configPath = path.join(homeDir, "config.ini"); // Path to config.ini in home directory
+
+      // Read the existing config file
+      let config = await fs.promises.readFile(configPath, "utf-8");
+
+      // Update the orientation in the config file
+      config = config.replace(/^orientation\s*=.*/m, `orientation=${rotation}`);
+
+      // Write the updated config file back to the file system
+      await fs.promises.writeFile(configPath, config, "utf-8");
+
+      console.log(`Local config.ini updated with orientation=${rotation}`);
+    };
+
+    // Update the local config.ini file first
+    await updateLocalRotation(rotation);
 
     // Iterate over each node and update only the orientation
     for (const node of rows) {
