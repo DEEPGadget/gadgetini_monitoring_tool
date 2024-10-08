@@ -97,7 +97,7 @@ export default function DisplayControl({ nodelist }) {
             className="flex items-center bg-green-500 text-white p-2 rounded"
             disabled={loading}
           >
-            {loadingRotation ? (
+            {loading ? (
               <LoadingSpinner /> // Show spinner when loading
             ) : (
               <>
@@ -111,7 +111,7 @@ export default function DisplayControl({ nodelist }) {
             className="flex items-center bg-green-500 text-white p-2 rounded"
             disabled={loading}
           >
-            {loadingRotation ? (
+            {loading ? (
               <LoadingSpinner /> // Show spinner when loading
             ) : (
               <>
