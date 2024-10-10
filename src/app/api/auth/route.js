@@ -9,8 +9,7 @@ const dbConfig = {
 };
 
 export async function POST(request) {
-  const { password } = await request.json();
-  const username = os.userInfo().username;
+  const { username,password } = await request.json();
 
   try {
     const connection = await mysql.createConnection(dbConfig);
