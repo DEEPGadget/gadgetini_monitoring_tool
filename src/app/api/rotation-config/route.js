@@ -29,6 +29,7 @@ export async function POST(request) {
 
     // Fetch node IP addresses and credentials from the database
     const connection = await mysql.createConnection(dbConfig);
+    console.log(connection);
     const [rows] = await connection.execute(
       "SELECT username, ipaddress, password FROM iplists"
     );
