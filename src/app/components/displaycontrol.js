@@ -196,8 +196,14 @@ export default function DisplayControl({ nodelist }) {
             className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all ml-2"
             disabled={loadingApply}
           >
-            <CheckIcon className="w-5 h-5 mr-2" />
-            Apply
+            {loadingApply ? (
+      <LoadingSpinner /> // Show spinner when Apply button is loading
+    ) : (
+      <>
+        <CheckIcon className="w-5 h-5 mr-2" />
+        Apply
+      </>
+    )}
           </button>
         </div>
       </div>
