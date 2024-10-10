@@ -98,7 +98,7 @@ export default function DisplayControl({ nodelist }) {
             disabled={loadingVertical}
           >
             {loadingVertical ? (
-              <LoadingSpinner /> // Show spinner when loading Vertical
+              <LoadingSpinner />
             ) : (
               <>
                 <ArrowUpIcon className="w-5 h-5 mr-1" />
@@ -112,7 +112,7 @@ export default function DisplayControl({ nodelist }) {
             disabled={loadingHorizontal}
           >
             {loadingHorizontal ? (
-              <LoadingSpinner /> // Show spinner when loading Horizontal
+              <LoadingSpinner />
             ) : (
               <>
                 <ArrowRightIcon className="w-5 h-5 mr-1" />
@@ -197,13 +197,13 @@ export default function DisplayControl({ nodelist }) {
             disabled={loadingApply}
           >
             {loadingApply ? (
-      <LoadingSpinner /> // Show spinner when Apply button is loading
-    ) : (
-      <>
-        <CheckIcon className="w-5 h-5 mr-2" />
-        Apply
-      </>
-    )}
+              <LoadingSpinner />
+            ) : (
+              <>
+                <CheckIcon className="w-5 h-5 mr-2" />
+                Apply
+              </>
+            )}
           </button>
         </div>
       </div>
