@@ -2,23 +2,9 @@ import { Client } from "ssh2";
 import mysql from "mysql2/promise";
 import fs from "fs";
 import path from "path";
-import os from "os";
-
-function getLocalIPAddress() {
-  const networkInterfaces = os.networkInterfaces();
-  for (const interfaceName in networkInterfaces) {
-    const interfaces = networkInterfaces[interfaceName];
-    for (const iface of interfaces) {
-      if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address;
-      }
-    }
-  }
-  return "localhost"; // Fallback to localhost if no external IP found
-}
 
 const dbConfig = {
-  host: getLocalIPAddress(),
+  host: "localhost",
   user: "root",
   database: "gadgetini",
 };
