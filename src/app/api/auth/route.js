@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import os from "os";
 
 const dbConfig = {
-  host: "localhost",
+  host: "127.0.0.1",
   user: "root",
   database: "gadgetini",
 };

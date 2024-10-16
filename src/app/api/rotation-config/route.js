@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 const dbConfig = {
-  host: "localhost",
+  host: "127.0.0.1",
   user: "root",
   database: "gadgetini",
 };
@@ -15,7 +15,6 @@ export async function POST(request) {
 
     // Fetch node IP addresses and credentials from the database
     const connection = await mysql.createConnection(dbConfig);
-    console.log(connection);
     const [rows] = await connection.execute(
       "SELECT username, ipaddress, password FROM iplists"
     );
@@ -29,7 +28,6 @@ export async function POST(request) {
           .on("ready", () => {
             // Command to update only the orientation in config.ini
             const command = `sed -i 's/^orientation\\s*=.*/orientation=${rotation}/' ~/config.ini`;
-            console.log("Running command on remote:", command);
             // Execute the command on the remote node
             conn.exec(command, (err) => {
               if (err) {

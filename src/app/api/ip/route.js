@@ -2,7 +2,7 @@ import mysql from "mysql2/promise";
 import { Client } from "ssh2";
 
 const dbConfig = {
-  host: "localhost",
+  host: "127.0.0.1",
   user: "root",
   database: "gadgetini",
 };

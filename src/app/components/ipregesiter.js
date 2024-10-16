@@ -35,7 +35,6 @@ export default function IPRegister() {
       const response = await fetch("/api/username");
       const data = await response.json();
       setUsername(data.username);
-      console.log("Fetched username:", data.username);
     } catch (error) {
       console.error("Failed to fetch username:", error);
     }
@@ -46,7 +45,6 @@ export default function IPRegister() {
       const response = await fetch("/api/localhostip");
       const data = await response.json();
       setLocalIP(data.ipv4);
-      console.log("Fetched local IP:", data.ipv4);
     } catch (error) {
       console.error("Failed to fetch local IP:", error);
     }
