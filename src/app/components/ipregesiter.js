@@ -228,27 +228,6 @@ export default function IPRegister() {
               </tr>
             </thead>
             <tbody>
-              <tr className="text-center border-t border-gray-300">
-                <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">
-                  center node
-                </td>
-                <td className="truncate border border-gray-300"></td>
-                <td className="border border-gray-300 py-2 font-bold text-blue-600">
-                  {`${localIP}`}
-                </td>
-                <td className="border border-gray-300 w-1/8"></td>
-                <td className="border border-gray-300 w-1/8"></td>
-                <td className="border border-gray-300 w-1/5">
-                  <a
-                    href={`http://${localIP}:3000`}
-                    target="_blank"
-                    className="flex justify-center items-center bg-green-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-green-600 transition-all mx-auto"
-                  >
-                    <FaExternalLinkAlt className="mr-1" /> Connect
-                  </a>
-                </td>
-                <td className="border border-gray-300 w-1/5 text-center"></td>
-              </tr>
               {nodelist
                 .sort((a, b) => a.serveralias.localeCompare(b.serveralias))
                 .map((node) => (
