@@ -12,6 +12,7 @@ export default function IPRegister() {
   const [loading, setLoading] = useState(false);
   const [localIP, setLocalIP] = useState("localhost");
 
+  const serverUsernameRef = useRef();
   const serverAliasRef = useRef();
   const serverIPRef = useRef();
   const serverPasswordRef = useRef();
@@ -52,6 +53,7 @@ export default function IPRegister() {
     setLoading(true);
     try {
       const formData = {
+        serverusername: serverUsernameRef.current.value,
         serveralias: serverAliasRef.current.value,
         serveripaddress: serverIPRef.current.value,
         serverpassword: serverPasswordRef.current.value,
@@ -114,6 +116,12 @@ export default function IPRegister() {
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-4">Register</h2>
         <div className="flex gap-4 mb-4">
+          <input
+            type="text"
+            ref={serverUsernameRef}
+            placeholder="Server Username"
+            className="border p-2"
+          />
           <input
             type="text"
             ref={serverAliasRef}
