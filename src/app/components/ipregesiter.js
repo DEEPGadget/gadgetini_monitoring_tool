@@ -90,25 +90,34 @@ export default function IPRegister() {
   };
 
   const handleDelete = async (serveripaddress, piipaddress) => {
-    try {
-      const response = await fetch("/api/ip", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ serveripaddress, piipaddress }),
-      });
+    // Show confirmation dialog
+    const confirmed = window.confirm("Are you sure you want to delete?");
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok.");
+    // If user clicks "Yes" (OK)
+    if (confirmed) {
+      try {
+        const response = await fetch("/api/ip", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ serveripaddress, piipaddress }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok.");
+        }
+
+        const result = await response.json();
+        console.log(result.message);
+
+        await loadIPList(); // Reload the IP list after successful deletion
+      } catch (error) {
+        console.error("Delete error:", error);
       }
-
-      const result = await response.json();
-      console.log(result.message);
-
-      await loadIPList();
-    } catch (error) {
-      console.error("Delete error:", error);
+    } else {
+      // If user clicks "No" (Cancel), do nothing
+      console.log("Deletion cancelled.");
     }
   };
 
