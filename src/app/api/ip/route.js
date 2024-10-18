@@ -163,22 +163,12 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    const { username, ipaddress } = await request.json();
-
-    if (!username || !ipaddress) {
-      return new Response(
-        JSON.stringify({ error: "Username and IP address are required." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    const { serveripaddress, piipaddress } = await request.json();
 
     const connection = await mysql.createConnection(dbConfig);
     const [result] = await connection.execute(
-      "DELETE FROM iplists WHERE username = ? AND ipaddress = ?",
-      [username, ipaddress]
+      "DELETE FROM iplists WHERE serveripaddress = ? AND piipaddress = ?",
+      [serveripaddress, piipaddress]
     );
     await connection.end();
 
