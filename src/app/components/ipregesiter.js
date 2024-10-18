@@ -2,22 +2,20 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
-import Image from "next/image";
+import LoadingSpinner from "../utils/LoadingSpinner";
 import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
 import { fetchIPList } from "../utils/fetchIPList";
-import LoadingSpinner from "../utils/LoadingSpinner";
+import Image from "next/image";
 
 export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
-  const [localIP, setLocalIP] = useState("localhost");
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState("");
+  const [localIP, setLocalIP] = useState("localhost");
 
-  const usernameRef = useRef();
-  const ipaddressRef = useRef();
-  const passwordRef = useRef();
-  const aliasRef = useRef();
-  const descriptionRef = useRef();
+  const serverAliasRef = useRef();
+  const serverIPRef = useRef();
+  const serverPasswordRef = useRef();
+  const piIPRef = useRef();
 
   useEffect(() => {
     loadIPList();
@@ -25,9 +23,14 @@ export default function IPRegister() {
     fetchUsername();
   }, []);
 
-  const loadIPList = async () => {
-    const data = await fetchIPList();
-    setNodelist(data);
+  const fetchLocalIP = async () => {
+    try {
+      const response = await fetch("/api/localhostip");
+      const data = await response.json();
+      setLocalIP(data.ipv4);
+    } catch (error) {
+      console.error("Failed to fetch local IP:", error);
+    }
   };
 
   const fetchUsername = async () => {
@@ -40,26 +43,21 @@ export default function IPRegister() {
     }
   };
 
-  const fetchLocalIP = async () => {
-    try {
-      const response = await fetch("/api/localhostip");
-      const data = await response.json();
-      setLocalIP(data.ipv4);
-    } catch (error) {
-      console.error("Failed to fetch local IP:", error);
-    }
+  const loadIPList = async () => {
+    const data = await fetchIPList();
+    setNodelist(data);
   };
 
   const handleRegister = async () => {
     setLoading(true);
     try {
       const formData = {
-        username: usernameRef.current.value,
-        ipaddress: ipaddressRef.current.value,
-        password: passwordRef.current.value,
-        alias: aliasRef.current.value,
-        description: descriptionRef.current.value,
+        serveralias: serverAliasRef.current.value,
+        serveripaddress: serverIPRef.current.value,
+        serverpassword: serverPasswordRef.current.value,
+        piipaddress: piIPRef.current.value,
       };
+
       const response = await fetch("/api/ip", {
         method: "POST",
         headers: {
@@ -77,26 +75,25 @@ export default function IPRegister() {
       console.log(result.message);
       await loadIPList();
 
-      usernameRef.current.value = "";
-      ipaddressRef.current.value = "";
-      passwordRef.current.value = "";
-      aliasRef.current.value = "";
-      descriptionRef.current.value = "";
+      serverAliasRef.current.value = "";
+      serverIPRef.current.value = "";
+      serverPasswordRef.current.value = "";
+      piIPRef.current.value = "";
     } catch (error) {
-      console.error("등록 오류:", error);
+      console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (username, ipaddress) => {
+  const handleDelete = async (serveripaddress, piipaddress) => {
     try {
       const response = await fetch("/api/ip", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, ipaddress }),
+        body: JSON.stringify({ serveripaddress, piipaddress }),
       });
 
       if (!response.ok) {
@@ -108,7 +105,7 @@ export default function IPRegister() {
 
       await loadIPList();
     } catch (error) {
-      console.error("삭제 오류:", error);
+      console.error("Delete error:", error);
     }
   };
 
@@ -119,32 +116,26 @@ export default function IPRegister() {
         <div className="flex gap-4 mb-4">
           <input
             type="text"
-            ref={usernameRef}
-            placeholder="Username"
+            ref={serverAliasRef}
+            placeholder="Server Alias"
             className="border p-2"
           />
           <input
             type="text"
-            ref={ipaddressRef}
-            placeholder="IP Address"
+            ref={serverIPRef}
+            placeholder="Server IP Address"
             className="border p-2"
           />
           <input
             type="password"
-            ref={passwordRef}
-            placeholder="Password"
+            ref={serverPasswordRef}
+            placeholder="Server Password"
             className="border p-2"
           />
           <input
             type="text"
-            ref={aliasRef}
-            placeholder="Alias"
-            className="border p-2"
-          />
-          <input
-            type="text"
-            ref={descriptionRef}
-            placeholder="Description"
+            ref={piIPRef}
+            placeholder="Pi IP Address"
             className="border p-2"
           />
           <button
@@ -167,14 +158,19 @@ export default function IPRegister() {
           <table className="min-w-full bg-white table-fixed border-separate border-spacing-0">
             <thead>
               <tr className="border-b-2 border-gray-400">
-                <th className="py-2 w-1/5 border border-gray-300">
-                  Username@IP
+                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
+                  Server Alias
                 </th>
-                <th className="py-2 w-1/5 border border-gray-300">Alias</th>
-                <th className="py-2 w-2/5 border border-gray-300">
-                  Description
+                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
+                  Server IP
                 </th>
-                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
+                  Pi IP Address
+                </th>
+                <th
+                  className="py-2 w-1/4 border border-gray-300 text-center"
+                  colSpan="2"
+                >
                   <Image
                     src="/icons/terminal.png"
                     alt="SSH"
@@ -184,7 +180,10 @@ export default function IPRegister() {
                   />
                   SSH
                 </th>
-                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                <th
+                  className="py-2 w-1/8 border border-gray-300 text-center"
+                  rowSpan="2"
+                >
                   <Image
                     src="/icons/grafana.png"
                     alt="Grafana"
@@ -194,20 +193,32 @@ export default function IPRegister() {
                   />
                   Grafana
                 </th>
-                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                <th
+                  className="py-2 w-1/8 border border-gray-300 text-center"
+                  rowSpan="2"
+                >
                   Delete
+                </th>
+              </tr>
+              <tr className="border-b-2 border-gray-400">
+                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                  Server SSH
+                </th>
+                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                  Pi SSH
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr className="text-center border-t border-gray-300">
-                <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">{`${username}@${localIP}`}</td>
                 <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">
                   center node
                 </td>
                 <td className="truncate border border-gray-300 py-2 font-bold text-blue-600">
-                  This center node manages leaf nodes
+                  {`${localIP}`}
                 </td>
+                <td className="border border-gray-300 w-1/8 text-center"></td>
+                <td className="border border-gray-300 w-1/8 text-center"></td>
                 <td className="border border-gray-300 w-1/8 text-center"></td>
                 <td className="border border-gray-300 w-1/8 text-center">
                   <a
@@ -222,21 +233,30 @@ export default function IPRegister() {
               </tr>
               {nodelist.map((node) => (
                 <tr
-                  key={node.ipaddress}
+                  key={`${node.serveripaddress}-${node.piipaddress}`}
                   className="text-center border-t border-gray-300"
                 >
-                  <td className="truncate border border-gray-300">
-                    {node.username}@{node.ipaddress}
+                  <td className="truncate border border-gray-300 py-2">
+                    {node.serveralias}
                   </td>
-                  <td className="truncate border border-gray-300">
-                    {node.alias}
+                  <td className="truncate border border-gray-300 py-2">
+                    {node.serveripaddress}
                   </td>
-                  <td className="truncate border border-gray-300">
-                    {node.description}
+                  <td className="truncate border border-gray-300 py-2">
+                    {node.piipaddress}
                   </td>
-                  <td className="border border-gray-300 w-1/8 text-center">
+                  <td className="border border-gray-300 w-1/8 text-center py-1">
                     <a
-                      href={`http://${localIP}:2222/ssh/host/${node.ipaddress}`}
+                      href={`http://${localIP}:2222/ssh/host/${node.serveripaddress}`}
+                      target="_blank"
+                      className="flex justify-center items-center bg-blue-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-blue-600 transition-all mx-auto"
+                    >
+                      <FaCheck className="mr-1" /> Connect
+                    </a>
+                  </td>
+                  <td className="border border-gray-300 w-1/8 text-center py-1">
+                    <a
+                      href={`http://${localIP}:2222/ssh/host/${node.piipaddress}`}
                       target="_blank"
                       className="flex justify-center items-center bg-blue-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-blue-600 transition-all mx-auto"
                     >
