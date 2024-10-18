@@ -11,7 +11,7 @@ export async function GET(request) {
   try {
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
-      "SELECT username, ipaddress, alias, description FROM iplists"
+      "SELECT serveralias, serveripaddress, piipaddress FROM iplists"
     );
     await connection.end();
 
