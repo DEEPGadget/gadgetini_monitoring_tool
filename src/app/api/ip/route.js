@@ -30,14 +30,26 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { serveralias, serveripaddress, serverpassword, piipaddress } =
-      await request.json();
+    const {
+      serverusername,
+      serveralias,
+      serveripaddress,
+      serverpassword,
+      piipaddress,
+    } = await request.json();
+    const piusername = "gadgetini";
+    const pipassword = "gadgetinidg12!@";
 
-    if (!serveripaddress || !serverpassword || !piipaddress) {
+    if (
+      !serverusername ||
+      !serveripaddress ||
+      !serverpassword ||
+      !piipaddress
+    ) {
       return new Response(
         JSON.stringify({
           error:
-            "Required missing : serveripaddress, serverpassword or piipaddress.",
+            "Required missing : serverusername, serveripaddress, serverpassword or piipaddress.",
         }),
         {
           status: 400,
@@ -46,30 +58,57 @@ export async function POST(request) {
       );
     }
 
-    const sshConnect = (username, ipaddress, password) => {
+    const serverSshConnect = (
+      serverusername,
+      serverpassword,
+      serveripaddress
+    ) => {
       return new Promise((resolve, reject) => {
         const conn = new Client();
         conn
           .on("ready", () => {
-            console.log("SSH Connection Successful");
+            console.log("Server SSH Connection Successful");
             resolve(true);
             conn.end();
           })
           .on("error", (err) => {
-            console.error("SSH Connection Failed:", err);
+            console.error("Server SSH Connection Failed:", err);
             reject(err);
           })
           .connect({
-            host: ipaddress,
+            host: serveripaddress,
             port: 22,
-            username: username,
-            password: password,
+            username: serverusername,
+            password: serverpassword,
+          });
+      });
+    };
+
+    const piSshConnect = (piipaddress) => {
+      return new Promise((resolve, reject) => {
+        const conn = new Client();
+        conn
+          .on("ready", () => {
+            console.log("RaspberryPiPi SSH Connection Successful");
+            resolve(true);
+            conn.end();
+          })
+          .on("error", (err) => {
+            console.error("RaspberryPi SSH Connection Failed:", err);
+            reject(err);
+          })
+          .connect({
+            host: piipaddress,
+            port: 22,
+            username: piusername,
+            password: pipassword,
           });
       });
     };
 
     try {
-      await sshConnect(username, ipaddress, password);
+      await serverSshConnect(serverusername, serverpassword, serveripaddress);
+      await piSshConnect(piipaddress);
     } catch (sshError) {
       return new Response(
         JSON.stringify({
@@ -86,8 +125,8 @@ export async function POST(request) {
 
     try {
       await connection.execute(
-        "INSERT INTO iplists (username, ipaddress, password, alias, description) VALUES (?, ?, ?, ?, ?)",
-        [username, ipaddress, password, alias, description]
+        "INSERT INTO iplists (serveralias, serveripaddress, piusername, piipaddress, pipassword) VALUES (?, ?, ?, ?, ?)",
+        [serveralias, serveripaddress, piusername, piipaddress, pipassword]
       );
     } catch (dbError) {
       if (dbError.code === "ER_DUP_ENTRY") {

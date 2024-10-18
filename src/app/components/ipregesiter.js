@@ -77,6 +77,7 @@ export default function IPRegister() {
       console.log(result.message);
       await loadIPList();
 
+      serverUsernameRef.current.value = "";
       serverAliasRef.current.value = "";
       serverIPRef.current.value = "";
       serverPasswordRef.current.value = "";
@@ -143,7 +144,7 @@ export default function IPRegister() {
           <input
             type="text"
             ref={piIPRef}
-            placeholder="Pi IP Address"
+            placeholder="RaspberryPi IP Address"
             className="border p-2"
           />
           <button
@@ -173,7 +174,7 @@ export default function IPRegister() {
                   Server IP
                 </th>
                 <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
-                  Pi IP Address
+                  RaspberryPi IP Address
                 </th>
                 <th
                   className="py-2 w-1/4 border border-gray-300 text-center"
