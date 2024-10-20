@@ -264,7 +264,7 @@ export default function IPRegister() {
                     </td>
                     <td className="border border-gray-300 w-1/5 text-center">
                       <a
-                        href={`http://${node.ipaddress}:3000`}
+                        href={`http://${node.piipaddress}:3000`}
                         target="_blank"
                         className="flex justify-center items-center bg-green-500 text-white w-32 px-6 py-1 rounded-lg hover:bg-green-600 transition-all mx-auto"
                       >
