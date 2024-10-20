@@ -180,7 +180,13 @@ export default function DisplayControl({ nodelist }) {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-end items-center">
+          <label
+            className="mr-2 text-gray-700 font-bold"
+            htmlFor="rotationTime"
+          >
+            Mode rotation time (seconds):
+          </label>
           <input
             type="number"
             placeholder="5"

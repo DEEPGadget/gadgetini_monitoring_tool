@@ -11,19 +11,19 @@ const dbConfig = {
 
 export async function POST(request) {
   try {
-    const { status } = await request.json();
+    const { status, rotationTime } = await request.json();
 
     // Fetch node IP addresses and credentials from the database
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
-      "SELECT username, ipaddress, password FROM iplists"
+      "SELECT piusername, piipaddress, pipassword FROM iplists"
     );
     await connection.end();
 
     const updateModes = (
-      username,
-      ipaddress,
-      password,
+      piusername,
+      piipaddress,
+      pipassword,
       status,
       rotationTime
     ) => {
@@ -66,15 +66,15 @@ export async function POST(request) {
             reject(err);
           })
           .connect({
-            host: ipaddress,
+            host: piipaddress,
             port: 22,
-            username: username,
-            password: password,
+            username: piusername,
+            password: pipassword,
           });
       });
     };
 
-    const updateLocalConfig = async (status) => {
+    const updateLocalConfig = async (status, rotationTime) => {
       const homeDir = require("os").homedir(); // Get home directory
       const configPath = path.join(homeDir, "config.ini"); // Path to config.ini in home directory
 
@@ -101,11 +101,17 @@ export async function POST(request) {
     };
 
     // Update the local config file first
-    await updateLocalConfig(status);
+    await updateLocalConfig(status, rotationTime);
 
     // Iterate over each node and update the modes
     for (const node of rows) {
-      await updateModes(node.username, node.ipaddress, node.password, status);
+      await updateModes(
+        node.piusername,
+        node.piipaddress,
+        node.pipassword,
+        status,
+        rotationTime
+      );
     }
 
     return new Response(

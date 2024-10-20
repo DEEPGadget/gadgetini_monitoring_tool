@@ -16,12 +16,12 @@ export async function POST(request) {
     // Fetch node IP addresses and credentials from the database
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
-      "SELECT username, ipaddress, password FROM iplists"
+      "SELECT piusername, piipaddress, pipassword FROM iplists"
     );
     console.log("Fetched IP list from database:", rows);
     await connection.end();
 
-    const updateRotation = (username, ipaddress, password, rotation) => {
+    const updateRotation = (piusername, piipaddress, pipassword, rotation) => {
       return new Promise((resolve, reject) => {
         const conn = new Client();
         conn
@@ -43,10 +43,10 @@ export async function POST(request) {
             reject(err);
           })
           .connect({
-            host: ipaddress,
+            host: piipaddress,
             port: 22,
-            username: username,
-            password: password,
+            username: piusername,
+            password: pipassword,
           });
       });
     };
@@ -73,9 +73,9 @@ export async function POST(request) {
     // Iterate over each node and update only the orientation
     for (const node of rows) {
       await updateRotation(
-        node.username,
-        node.ipaddress,
-        node.password,
+        node.piusername,
+        node.piipaddress,
+        node.pipassword,
         rotation
       );
     }
