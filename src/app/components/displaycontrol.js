@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowUpIcon, ArrowRightIcon, CheckIcon } from "@heroicons/react/solid";
 import LoadingSpinner from "../utils/LoadingSpinner";
 
@@ -13,12 +13,35 @@ export default function DisplayControl({ nodelist }) {
 
   // State to manage the on/off status of each info item
   const [status, setStatus] = useState({
+    orientation: "vertical",
     cpu: false,
     gpu: false,
     psu: false,
     network: false,
     sensors: false,
   });
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch("/api/rotation-config"); // Change to the correct API endpoint
+        const data = await response.json();
+
+        setStatus({
+          orientation: data.orientation,
+          cpu: data.cpu === "on",
+          gpu: data.gpu === "on",
+          psu: data.psu === "on",
+          network: data.network === "on",
+          sensors: data.sensors === "on",
+        });
+        setRotationTime(data.rotationTime);
+      } catch (error) {
+        console.error("Failed to fetch config:", error);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   // Function to handle rotation API calls
   const handleRotation = async (rotationValue, setLoading) => {
@@ -94,7 +117,9 @@ export default function DisplayControl({ nodelist }) {
         <div className="flex gap-4 mb-4">
           <button
             onClick={setVertical}
-            className="flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all"
+            className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
+              status.orientation === "vertical" ? "border-2 border-black" : ""
+            }`}
             disabled={loadingVertical}
           >
             {loadingVertical ? (
@@ -108,7 +133,9 @@ export default function DisplayControl({ nodelist }) {
           </button>
           <button
             onClick={setHorizontal}
-            className="flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all"
+            className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
+              status.orientation === "horizontal" ? "border-2 border-black" : ""
+            }`}
             disabled={loadingHorizontal}
           >
             {loadingHorizontal ? (
@@ -158,20 +185,24 @@ export default function DisplayControl({ nodelist }) {
                     <button
                       onClick={() => toggleStatus(key)}
                       className={`relative flex items-center w-20 h-8 rounded-full border-2 border-gray-400 transition-colors duration-300 ${
-                        status[key] ? "bg-green-500" : "bg-red-500"
+                        status[key.toLowerCase()]
+                          ? "bg-green-500"
+                          : "bg-red-500"
                       }`}
                     >
                       <span
                         className={`absolute left-1 transition-transform duration-300 transform ${
-                          status[key] ? "translate-x-11" : "translate-x-0"
+                          status[key.toLowerCase()]
+                            ? "translate-x-11"
+                            : "translate-x-0"
                         } bg-white rounded-full w-6 h-6`}
                       />
                       <span
                         className={`text-white font-bold transition-all duration-300 ${
-                          status[key] ? "ml-2" : "ml-10"
+                          status[key.toLowerCase()] ? "ml-2" : "ml-10"
                         }`}
                       >
-                        {status[key] ? "On" : "Off"}
+                        {status[key.toLowerCase()] ? "On" : "Off"}
                       </span>
                     </button>
                   </td>

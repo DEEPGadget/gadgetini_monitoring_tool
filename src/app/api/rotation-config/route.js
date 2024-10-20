@@ -9,6 +9,53 @@ const dbConfig = {
   database: "gadgetini",
 };
 
+export async function GET(request) {
+  const parseConfig = (configContent) => {
+    const configLines = configContent.split("\n");
+    const config = {};
+
+    configLines.forEach((line) => {
+      const [key, value] = line.split("=");
+      if (key && value) {
+        config[key.trim()] = value.trim();
+      }
+    });
+
+    return {
+      orientation: config.orientation,
+      cpu: config.cpumode,
+      gpu: config.gpumode,
+      psu: config.psumode,
+      network: config.networkmode,
+      sensors: config.sensormode,
+      rotationTime: Number(config.time),
+    };
+  };
+
+  try {
+    const homeDir = require("os").homedir();
+    const configFilePath = path.join(homeDir, "config.ini");
+
+    const configContent = await fs.promises.readFile(configFilePath, "utf-8");
+    const parsedConfig = parseConfig(configContent);
+
+    console.log(parsedConfig);
+    return new Response(JSON.stringify(parsedConfig), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error reading config file:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to read config file." }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}
+
 export async function POST(request) {
   try {
     const { rotation } = await request.json();
