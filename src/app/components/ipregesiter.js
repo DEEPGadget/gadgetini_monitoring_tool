@@ -173,20 +173,20 @@ export default function IPRegister() {
       <div>
         <h2 className="text-xl font-bold mb-4">IP Table</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white table-auto border-separate border-spacing-0">
+          <table className="min-w-full bg-white border-separate border-spacing-0 table-fixed">
             <thead>
               <tr className="border-b-2 border-gray-400">
-                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
+                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
                   Server Alias
                 </th>
-                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
+                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
                   Server IP
                 </th>
-                <th className="py-2 w-1/5 border border-gray-300" rowSpan="2">
-                  RaspberryPi IP Address
+                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
+                  RaspberryPi IP
                 </th>
                 <th
-                  className="py-2 w-1/4 border border-gray-300 text-center"
+                  className="w-[25%] border border-gray-300 text-center"
                   colSpan="2"
                 >
                   <Image
@@ -199,7 +199,7 @@ export default function IPRegister() {
                   SSH
                 </th>
                 <th
-                  className="py-2 w-1/5 border border-gray-300 text-center"
+                  className="w-[12.5%] border border-gray-300 text-center"
                   rowSpan="2"
                 >
                   <Image
@@ -212,18 +212,18 @@ export default function IPRegister() {
                   Grafana
                 </th>
                 <th
-                  className="py-2 w-1/5 border border-gray-300 text-center"
+                  className="w-[12.5%] border border-gray-300 text-center"
                   rowSpan="2"
                 >
                   Delete
                 </th>
               </tr>
               <tr className="border-b-2 border-gray-400">
-                <th className="py-2 w-1/8 border border-gray-300 text-center">
+                <th className="w-[12.5%] border border-gray-300 text-center">
                   Server SSH
                 </th>
-                <th className="py-2 w-1/8 border border-gray-300 text-center">
-                  Pi SSH
+                <th className="w-[12.5%] border border-gray-300 text-center">
+                  RaspberryPi SSH
                 </th>
               </tr>
             </thead>
@@ -244,7 +244,7 @@ export default function IPRegister() {
                     <td className="truncate border border-gray-300 py-2">
                       {node.piipaddress}
                     </td>
-                    <td className="border border-gray-300 w-1/8 text-center py-1">
+                    <td className="w-[12.5%] border border-gray-300 text-center py-1">
                       <a
                         href={`http://${localIP}:2222/ssh/host/${node.serveripaddress}`}
                         target="_blank"
@@ -253,7 +253,7 @@ export default function IPRegister() {
                         <FaCheck className="mr-1" /> Connect
                       </a>
                     </td>
-                    <td className="border border-gray-300 w-1/8 text-center py-1">
+                    <td className="w-[12.5%] border border-gray-300 text-center py-1">
                       <a
                         href={`http://${localIP}:2222/ssh/host/${node.piipaddress}`}
                         target="_blank"
@@ -262,7 +262,7 @@ export default function IPRegister() {
                         <FaCheck className="mr-1" /> Connect
                       </a>
                     </td>
-                    <td className="border border-gray-300 w-1/5 text-center">
+                    <td className="w-[12.5%] border border-gray-300 text-center">
                       <a
                         href={`http://${node.piipaddress}:3000`}
                         target="_blank"
@@ -271,7 +271,7 @@ export default function IPRegister() {
                         <FaExternalLinkAlt className="mr-1" /> Connect
                       </a>
                     </td>
-                    <td className="border border-gray-300 w-1/5 text-center">
+                    <td className="w-[12.5%] border border-gray-300 text-center">
                       <button
                         onClick={() =>
                           handleDelete(node.serveripaddress, node.piipaddress)
