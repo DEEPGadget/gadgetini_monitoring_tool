@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import LoadingSpinner from "../utils/LoadingSpinner";
-import { FaCheck, FaExternalLinkAlt, FaTimes } from "react-icons/fa";
+import { FaCheck, FaExternalLinkAlt, FaTimes, FaEdit } from "react-icons/fa";
 import { fetchIPList } from "../utils/fetchIPList";
 import Image from "next/image";
 
@@ -90,10 +90,7 @@ export default function IPRegister() {
   };
 
   const handleDelete = async (serveripaddress, piipaddress) => {
-    // Show confirmation dialog
     const confirmed = window.confirm("Are you sure you want to delete?");
-
-    // If user clicks "Yes" (OK)
     if (confirmed) {
       try {
         const response = await fetch("/api/ip", {
@@ -111,13 +108,43 @@ export default function IPRegister() {
         const result = await response.json();
         console.log(result.message);
 
-        await loadIPList(); // Reload the IP list after successful deletion
+        await loadIPList();
       } catch (error) {
         console.error("Delete error:", error);
       }
     } else {
-      // If user clicks "No" (Cancel), do nothing
       console.log("Deletion cancelled.");
+    }
+  };
+
+  const handleEdit = async (node, field) => {
+    const currentValue = node[field];
+    const newValue = window.prompt(`Edit ${field}`, currentValue);
+
+    if (newValue && newValue !== currentValue) {
+      try {
+        const response = await fetch("/api/ip", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            serveripaddress: node.serveripaddress,
+            piipaddress: node.piipaddress,
+            [field]: newValue,
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          alert(result.error || "Failed to update.");
+        } else {
+          console.log(result.message);
+          await loadIPList();
+        }
+      } catch (error) {
+        console.error("Edit error:", error);
+      }
     }
   };
 
@@ -237,12 +264,30 @@ export default function IPRegister() {
                   >
                     <td className="truncate border border-gray-300 py-2">
                       {node.serveralias}
+                      <button
+                        onClick={() => handleEdit(node, "serveralias")}
+                        className="ml-2 bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700 inline-flex items-center"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
                     </td>
                     <td className="truncate border border-gray-300 py-2">
                       {node.serveripaddress}
+                      <button
+                        onClick={() => handleEdit(node, "serveripaddress")}
+                        className="ml-2 bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700 inline-flex items-center"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
                     </td>
                     <td className="truncate border border-gray-300 py-2">
                       {node.piipaddress}
+                      <button
+                        onClick={() => handleEdit(node, "piipaddress")}
+                        className="ml-2 bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700 inline-flex items-center"
+                      >
+                        <FaEdit className="mr-1" /> Edit
+                      </button>
                     </td>
                     <td className="w-[12.5%] border border-gray-300 text-center py-1">
                       <a
