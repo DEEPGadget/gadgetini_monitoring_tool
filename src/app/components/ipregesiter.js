@@ -176,17 +176,26 @@ export default function IPRegister() {
           <table className="min-w-full bg-white border-separate border-spacing-0 table-fixed">
             <thead>
               <tr className="border-b-2 border-gray-400">
-                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
+                <th
+                  className="w-[12.5%] border border-gray-300 py-2"
+                  rowSpan="2"
+                >
                   Server Alias
                 </th>
-                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
+                <th
+                  className="w-[12.5%] border border-gray-300 py-2"
+                  rowSpan="2"
+                >
                   Server IP
                 </th>
-                <th className="w-[12.5%] border border-gray-300" rowSpan="2">
+                <th
+                  className="w-[12.5%] border border-gray-300 py-2"
+                  rowSpan="2"
+                >
                   RaspberryPi IP
                 </th>
                 <th
-                  className="w-[25%] border border-gray-300 text-center"
+                  className="w-[25%] border border-gray-300 text-center py-2"
                   colSpan="2"
                 >
                   <Image
@@ -219,10 +228,10 @@ export default function IPRegister() {
                 </th>
               </tr>
               <tr className="border-b-2 border-gray-400">
-                <th className="w-[12.5%] border border-gray-300 text-center">
+                <th className="w-[12.5%] border border-gray-300 text-center py-2">
                   Server SSH
                 </th>
-                <th className="w-[12.5%] border border-gray-300 text-center">
+                <th className="w-[12.5%] border border-gray-300 text-center py-2">
                   RaspberryPi SSH
                 </th>
               </tr>
