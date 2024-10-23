@@ -163,7 +163,7 @@ export default function IPRegister() {
           <input
             type="text"
             ref={serverAliasRef}
-            placeholder="Server Alias"
+            placeholder="Server Alias (30)"
             className="border p-2"
           />
           <input
