@@ -9,7 +9,9 @@ export async function GET() {
     if (
       iface.toLowerCase().includes("wifi") ||
       iface.toLowerCase().includes("wi-fi") ||
-      iface.toLowerCase().includes("wlan")
+      iface.toLowerCase().includes("wlan") ||
+      iface.toLowerCase().includes("eth") ||
+      iface.toLowerCase().includes("VMnet")
     ) {
       for (let alias of interfaces[iface]) {
         if (alias.family === "IPv4" && !alias.internal) {
