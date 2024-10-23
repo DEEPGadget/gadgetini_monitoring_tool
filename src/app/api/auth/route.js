@@ -1,15 +1,9 @@
 import mysql from "mysql2/promise";
 import { NextResponse } from "next/server";
-import os from "os";
-
-const dbConfig = {
-  host: "127.0.0.1",
-  user: "root",
-  database: "gadgetini",
-};
+import dbConfig from "../../utils/dbConfig";
 
 export async function POST(request) {
-  const { username,password } = await request.json();
+  const { username, password } = await request.json();
 
   try {
     const connection = await mysql.createConnection(dbConfig);
