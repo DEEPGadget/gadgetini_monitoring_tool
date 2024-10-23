@@ -131,7 +131,8 @@ export default function IPRegister() {
           body: JSON.stringify({
             serveripaddress: node.serveripaddress,
             piipaddress: node.piipaddress,
-            [field]: newValue,
+            field: field,
+            value: newValue,
           }),
         });
 
