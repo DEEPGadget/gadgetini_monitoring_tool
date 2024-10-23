@@ -80,13 +80,13 @@ export default function DisplayControl({ nodelist }) {
   };
 
   // Function to toggle status
-const toggleStatus = (key) => {
-  const lowercaseKey = key.toLowerCase(); // 키 값을 소문자로 변환
-  setStatus((prevStatus) => ({
-    ...prevStatus,
-    [lowercaseKey]: !prevStatus[lowercaseKey],
-  }));
-};
+  const toggleStatus = (key) => {
+    const lowercaseKey = key.toLowerCase(); // 키 값을 소문자로 변환
+    setStatus((prevStatus) => ({
+      ...prevStatus,
+      [lowercaseKey]: !prevStatus[lowercaseKey],
+    }));
+  };
 
   // Function to handle status apply button
   const handleApply = async () => {
