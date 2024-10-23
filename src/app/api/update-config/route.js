@@ -70,7 +70,7 @@ export async function POST(request) {
     };
 
     const updateLocalConfig = async (status, rotationTime) => {
-      const homeDir = require("os").homedir(); // Get home directory
+      const homeDir = "/home/gadgetini"; // Get home directory
       const configPath = path.join(homeDir, "config.ini"); // Path to config.ini in home directory
 
       // Read the existing config file

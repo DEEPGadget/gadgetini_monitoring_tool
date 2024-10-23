@@ -28,7 +28,7 @@ export async function GET(request) {
   };
 
   try {
-    const homeDir = require("os").homedir();
+    const homeDir = "/home/gadgetini";
     const configFilePath = path.join(homeDir, "config.ini");
 
     const configContent = await fs.promises.readFile(configFilePath, "utf-8");
@@ -94,7 +94,7 @@ export async function POST(request) {
     };
 
     const updateLocalRotation = async (rotation) => {
-      const homeDir = require("os").homedir(); // Get home directory
+      const homeDir = "/home/gadgetini"; // Get home directory
       const configPath = path.join(homeDir, "config.ini"); // Path to config.ini in home directory
 
       // Read the existing config file
