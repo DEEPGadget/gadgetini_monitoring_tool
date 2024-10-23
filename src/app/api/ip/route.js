@@ -7,27 +7,64 @@ const dbConfig = {
   database: "gadgetini",
 };
 
-export async function GET(request) {
+// Define a map for database error codes and their corresponding messages
+const dbErrorMessages = {
+  ER_DUP_ENTRY: "Duplicate entry.",
+  ER_DATA_TOO_LONG: "Too Long Data.",
+};
+
+// Function to get error message from error code
+const getDbErrorMessage = (code) => dbErrorMessages[code] || "Database error.";
+
+// Utility function to create a MySQL connection
+const createConnection = async () => mysql.createConnection(dbConfig);
+
+// Utility function for responding with JSON
+const jsonResponse = (data, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+
+// SSH connection utility function
+const sshConnect = (host, username, password) => {
+  return new Promise((resolve, reject) => {
+    const conn = new Client();
+    conn
+      .on("ready", () => {
+        console.log(`SSH Connection Successful to ${host}`);
+        resolve(true);
+        conn.end();
+      })
+      .on("error", (err) => {
+        console.error(`SSH Connection Failed to ${host}:`, err);
+        reject(err);
+      })
+      .connect({
+        host,
+        port: 22,
+        username,
+        password,
+      });
+  });
+};
+
+// GET: Fetch all IP list entries
+export async function GET() {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await createConnection();
     const [rows] = await connection.execute(
       "SELECT serveralias, serveripaddress, piipaddress FROM iplists"
     );
     await connection.end();
-
-    return new Response(JSON.stringify(rows), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse(rows);
   } catch (error) {
     console.error("Database error:", error);
-    return new Response(JSON.stringify({ error: "Database error." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Database error." }, 500);
   }
 }
 
+// POST: Register a new IP entry
 export async function POST(request) {
   try {
     const {
@@ -46,193 +83,96 @@ export async function POST(request) {
       !serverpassword ||
       !piipaddress
     ) {
-      return new Response(
-        JSON.stringify({
+      return jsonResponse(
+        {
           error:
-            "Required missing : serverusername, serveripaddress, serverpassword or piipaddress.",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+            "Missing required fields: serverusername, serveripaddress, serverpassword, piipaddress.",
+        },
+        400
       );
     }
 
-    const serverSshConnect = (
-      serverusername,
-      serverpassword,
-      serveripaddress
-    ) => {
-      return new Promise((resolve, reject) => {
-        const conn = new Client();
-        conn
-          .on("ready", () => {
-            console.log("Server SSH Connection Successful");
-            resolve(true);
-            conn.end();
-          })
-          .on("error", (err) => {
-            console.error("Server SSH Connection Failed:", err);
-            reject(err);
-          })
-          .connect({
-            host: serveripaddress,
-            port: 22,
-            username: serverusername,
-            password: serverpassword,
-          });
-      });
-    };
-
-    const piSshConnect = (piipaddress) => {
-      return new Promise((resolve, reject) => {
-        const conn = new Client();
-        conn
-          .on("ready", () => {
-            console.log("RaspberryPiPi SSH Connection Successful");
-            resolve(true);
-            conn.end();
-          })
-          .on("error", (err) => {
-            console.error("RaspberryPi SSH Connection Failed:", err);
-            reject(err);
-          })
-          .connect({
-            host: piipaddress,
-            port: 22,
-            username: piusername,
-            password: pipassword,
-          });
-      });
-    };
-
+    // Attempt SSH connections to server and RaspberryPi
     try {
-      await serverSshConnect(serverusername, serverpassword, serveripaddress);
-      await piSshConnect(piipaddress);
+      await sshConnect(serveripaddress, serverusername, serverpassword);
+      await sshConnect(piipaddress, piusername, pipassword);
     } catch (sshError) {
-      return new Response(
-        JSON.stringify({
-          error: `SSH connection failed: ${sshError.message}`,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+      return jsonResponse(
+        { error: `SSH connection failed: ${sshError.message}` },
+        400
       );
     }
 
-    const connection = await mysql.createConnection(dbConfig);
-
+    // Insert into database
     try {
+      const connection = await createConnection();
       await connection.execute(
         "INSERT INTO iplists (serveralias, serveripaddress, piusername, piipaddress, pipassword) VALUES (?, ?, ?, ?, ?)",
         [serveralias, serveripaddress, piusername, piipaddress, pipassword]
       );
-    } catch (dbError) {
-      if (dbError.code === "ER_DUP_ENTRY") {
-        return new Response(
-          JSON.stringify({
-            error: "Duplicate entry: username and IP address already exist.",
-          }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
-      throw dbError;
-    } finally {
       await connection.end();
+      return jsonResponse({ message: "Data inserted successfully!" });
+    } catch (dbError) {
+      const errorResponse = getDbErrorMessage(dbError.code);
+      return jsonResponse({ error: errorResponse }, 400);
     }
-
-    return new Response(
-      JSON.stringify({ message: "Data inserted successfully!" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
   } catch (error) {
     console.error("Database error:", error);
-    return new Response(JSON.stringify({ error: "Database error." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Database error." }, 500);
   }
 }
 
+// PUT: Update an existing IP entry
 export async function PUT(request) {
   try {
     const { serveripaddress, piipaddress, field, value } = await request.json();
-
     if (!serveripaddress || !piipaddress || !field || !value) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields." }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return jsonResponse({ error: "Missing required fields." }, 400);
     }
 
-    const connection = await mysql.createConnection(dbConfig);
-
-    let query = `UPDATE iplists SET ${field} = ? WHERE serveripaddress = ? AND piipaddress = ?`;
-    const values = [value, serveripaddress, piipaddress];
-
-    const [result] = await connection.execute(query, values);
-
-    await connection.end();
-
-    return new Response(
-      JSON.stringify({ message: "Data updated successfully!" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    try {
+      const connection = await createConnection();
+      const query = `UPDATE iplists SET ${field} = ? WHERE serveripaddress = ? AND piipaddress = ?`;
+      await connection.execute(query, [value, serveripaddress, piipaddress]);
+      await connection.end();
+      return jsonResponse({ message: "Data updated successfully!" });
+    } catch (dbError) {
+      const errorResponse = getDbErrorMessage(dbError.code);
+      return jsonResponse({ error: errorResponse }, 400);
+    }
   } catch (error) {
     console.error("Database error:", error);
-    return new Response(JSON.stringify({ error: "Database error." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Database error." }, 500);
   }
 }
 
+// DELETE: Delete an existing IP entry
 export async function DELETE(request) {
   try {
     const { serveripaddress, piipaddress } = await request.json();
-
-    const connection = await mysql.createConnection(dbConfig);
-    const [result] = await connection.execute(
-      "DELETE FROM iplists WHERE serveripaddress = ? AND piipaddress = ?",
-      [serveripaddress, piipaddress]
-    );
-    await connection.end();
-
-    if (result.affectedRows === 0) {
-      return new Response(
-        JSON.stringify({ message: "No record found to delete." }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+    if (!serveripaddress || !piipaddress) {
+      return jsonResponse({ error: "Missing required fields." }, 400);
     }
 
-    return new Response(
-      JSON.stringify({ message: "Data deleted successfully!" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
+    try {
+      const connection = await createConnection();
+      const [result] = await connection.execute(
+        "DELETE FROM iplists WHERE serveripaddress = ? AND piipaddress = ?",
+        [serveripaddress, piipaddress]
+      );
+      await connection.end();
+
+      if (result.affectedRows === 0) {
+        return jsonResponse({ message: "No record found to delete." }, 404);
       }
-    );
+
+      return jsonResponse({ message: "Data deleted successfully!" });
+    } catch (dbError) {
+      const errorResponse = getDbErrorMessage(dbError.code);
+      return jsonResponse({ error: errorResponse }, 400);
+    }
   } catch (error) {
     console.error("Database error:", error);
-    return new Response(JSON.stringify({ error: "Database error." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Database error." }, 500);
   }
 }
