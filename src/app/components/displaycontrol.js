@@ -21,25 +21,26 @@ export default function DisplayControl({ nodelist }) {
     sensors: false,
   });
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await fetch("/api/rotation-config"); // Change to the correct API endpoint
-        const data = await response.json();
+  const fetchConfig = async () => {
+    try {
+      const response = await fetch("/api/rotation-config"); // Change to the correct API endpoint
+      const data = await response.json();
 
-        setStatus({
-          orientation: data.orientation,
-          cpu: data.cpu === "on",
-          gpu: data.gpu === "on",
-          psu: data.psu === "on",
-          network: data.network === "on",
-          sensors: data.sensors === "on",
-        });
-        setRotationTime(data.rotationTime);
-      } catch (error) {
-        console.error("Failed to fetch config:", error);
-      }
-    };
+      setStatus({
+        orientation: data.orientation,
+        cpu: data.cpu === "on",
+        gpu: data.gpu === "on",
+        psu: data.psu === "on",
+        network: data.network === "on",
+        sensors: data.sensors === "on",
+      });
+      setRotationTime(data.rotationTime);
+    } catch (error) {
+      console.error("Failed to fetch config:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchConfig();
   }, []);
 
@@ -57,6 +58,7 @@ export default function DisplayControl({ nodelist }) {
       });
 
       if (response.ok) {
+        fetchConfig();
         setSuccess(true);
         console.log("Rotation updated successfully");
       } else {
