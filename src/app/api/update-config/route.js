@@ -2,12 +2,7 @@ import { Client } from "ssh2";
 import mysql from "mysql2/promise";
 import fs from "fs";
 import path from "path";
-
-const dbConfig = {
-  host: "127.0.0.1",
-  user: "root",
-  database: "gadgetini",
-};
+import dbConfig from "../../utils/dbConfig";
 
 export async function POST(request) {
   try {

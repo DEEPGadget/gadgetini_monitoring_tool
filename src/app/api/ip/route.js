@@ -1,11 +1,6 @@
 import mysql from "mysql2/promise";
 import { Client } from "ssh2";
-
-const dbConfig = {
-  host: "127.0.0.1",
-  user: "root",
-  database: "gadgetini",
-};
+import dbConfig from "../../utils/dbConfig";
 
 // Define a map for database error codes and their corresponding messages
 const dbErrorMessages = {
