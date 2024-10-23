@@ -161,6 +161,45 @@ export async function POST(request) {
   }
 }
 
+export async function PUT(request) {
+  try {
+    const { serveripaddress, piipaddress, field, value } = await request.json();
+
+    if (!serveripaddress || !piipaddress || !field || !value) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields." }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const connection = await mysql.createConnection(dbConfig);
+
+    let query = `UPDATE iplists SET ${field} = ? WHERE serveripaddress = ? AND piipaddress = ?`;
+    const values = [value, serveripaddress, piipaddress];
+
+    const [result] = await connection.execute(query, values);
+
+    await connection.end();
+
+    return new Response(
+      JSON.stringify({ message: "Data updated successfully!" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Database error:", error);
+    return new Response(JSON.stringify({ error: "Database error." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
 export async function DELETE(request) {
   try {
     const { serveripaddress, piipaddress } = await request.json();
