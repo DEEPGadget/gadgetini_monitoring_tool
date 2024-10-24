@@ -12,10 +12,8 @@ export default function IPRegister() {
   const [loading, setLoading] = useState(false);
   const [localIP, setLocalIP] = useState("localhost");
 
-  const serverUsernameRef = useRef();
   const serverAliasRef = useRef();
   const serverIPRef = useRef();
-  const serverPasswordRef = useRef();
   const piIPRef = useRef();
 
   useEffect(() => {
@@ -53,10 +51,8 @@ export default function IPRegister() {
     setLoading(true);
     try {
       const formData = {
-        serverusername: serverUsernameRef.current.value,
         serveralias: serverAliasRef.current.value,
         serveripaddress: serverIPRef.current.value,
-        serverpassword: serverPasswordRef.current.value,
         piipaddress: piIPRef.current.value,
       };
 
@@ -77,10 +73,8 @@ export default function IPRegister() {
       console.log(result.message);
       await loadIPList();
 
-      serverUsernameRef.current.value = "";
       serverAliasRef.current.value = "";
       serverIPRef.current.value = "";
-      serverPasswordRef.current.value = "";
       piIPRef.current.value = "";
     } catch (error) {
       console.error("Registration error:", error);
@@ -156,12 +150,6 @@ export default function IPRegister() {
         <div className="flex gap-4 mb-4">
           <input
             type="text"
-            ref={serverUsernameRef}
-            placeholder="Server Username"
-            className="border p-2"
-          />
-          <input
-            type="text"
             ref={serverAliasRef}
             placeholder="Server Alias (30)"
             className="border p-2"
@@ -173,15 +161,9 @@ export default function IPRegister() {
             className="border p-2"
           />
           <input
-            type="password"
-            ref={serverPasswordRef}
-            placeholder="Server Password"
-            className="border p-2"
-          />
-          <input
             type="text"
             ref={piIPRef}
-            placeholder="RaspberryPi IP Address"
+            placeholder="Monitoring IP Address"
             className="border p-2"
           />
           <button
@@ -211,7 +193,7 @@ export default function IPRegister() {
                   Server IP
                 </th>
                 <th className="w-[12.5%] border border-gray-300 " rowSpan="2">
-                  RaspberryPi IP
+                  Monitoring IP
                 </th>
                 <th
                   className="w-[25%] border border-gray-300 text-center py-2"
@@ -251,7 +233,7 @@ export default function IPRegister() {
                   Server SSH
                 </th>
                 <th className="w-[12.5%] border border-gray-300 text-center py-2">
-                  RaspberryPi SSH
+                  Monitoring SSH
                 </th>
               </tr>
             </thead>

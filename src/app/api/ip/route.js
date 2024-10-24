@@ -62,38 +62,16 @@ export async function GET() {
 // POST: Register a new IP entry
 export async function POST(request) {
   try {
-    const {
-      serverusername,
-      serveralias,
-      serveripaddress,
-      serverpassword,
-      piipaddress,
-    } = await request.json();
+    const { serveralias, serveripaddress, piipaddress } = await request.json();
     const piusername = "gadgetini";
     const pipassword = "gadgetinidg12!@";
 
-    if (
-      !serverusername ||
-      !serveripaddress ||
-      !serverpassword ||
-      !piipaddress
-    ) {
+    if (!serveripaddress || !piipaddress) {
       return jsonResponse(
         {
           error:
             "Missing required fields: serverusername, serveripaddress, serverpassword, piipaddress.",
         },
-        400
-      );
-    }
-
-    // Attempt SSH connections to server and RaspberryPi
-    try {
-      await sshConnect(serveripaddress, serverusername, serverpassword);
-      await sshConnect(piipaddress, piusername, pipassword);
-    } catch (sshError) {
-      return jsonResponse(
-        { error: `SSH connection failed: ${sshError.message}` },
         400
       );
     }
