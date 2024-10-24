@@ -226,9 +226,14 @@ export default function DisplayControl({ nodelist }) {
             placeholder="5"
             min="1"
             value={rotationTime}
-            onChange={(e) =>
-              setRotationTime(Math.floor(Number(e.target.value)))
-            }
+            onChange={(e) => {
+              const value = Math.floor(Number(e.target.value));
+              if (value < 1) {
+                setRotationTime(1);
+              } else {
+                setRotationTime(value);
+              }
+            }}
             className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 
                border-gray-600 w-16"
           />
