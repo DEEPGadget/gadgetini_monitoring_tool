@@ -224,6 +224,7 @@ export default function DisplayControl({ nodelist }) {
           <input
             type="number"
             placeholder="5"
+            min="1"
             value={rotationTime}
             onChange={(e) =>
               setRotationTime(Math.floor(Number(e.target.value)))
