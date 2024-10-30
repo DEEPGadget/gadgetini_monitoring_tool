@@ -64,7 +64,7 @@ export async function POST(request) {
   try {
     const { serveralias, serveripaddress, piipaddress } = await request.json();
     const piusername = "gadgetini";
-    const pipassword = "gadgetinidg12!@";
+    const pipassword = process.env.PI_PASSWORD;
 
     if (!serveripaddress || !piipaddress) {
       return jsonResponse(
