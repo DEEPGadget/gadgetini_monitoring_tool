@@ -1,81 +1,74 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import LoadingSpinner from "./utils/LoadingSpinner";
+import { DocumentAddIcon, CogIcon } from "@heroicons/react/solid";
+import IPRegister from "./components/ipregesiter";
+import DisplayControl from "./components/displaycontrol";
+import Settings from "./components/settings";
 
-export default function Home() {
+export default function Auth() {
+  const [activeMenu, setActiveMenu] = useState("IP Register");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-      if (data.success) {
-        localStorage.setItem("isLoggedIn", "true");
-        router.push("/auth");
-      } else {
-        alert("Login failed: " + data.message);
+    if (!isLoggedIn) {
+      router.push("/");
+    }
+  }, [router]);
+
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const response = await fetch("/api/username");
+        const data = await response.json();
+        setUsername(data.username);
+      } catch (error) {
+        console.error("Failed to fetch username:", error);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("An error occurred during login.");
-    } finally {
-      setLoading(false);
+    }
+
+    fetchUsername();
+  }, []);
+  const renderComponent = () => {
+    switch (activeMenu) {
+      case "IP Register":
+        return <IPRegister />;
+      case "Display Control":
+        return <DisplayControl />;
+      case "Settings":
+        return <Settings />;
+      default:
+        return <div>Select a menu</div>;
     }
   };
 
   return (
-    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 min-h-screen flex flex-col items-center justify-center">
-      <main className="flex flex-col sm:flex-row items-center justify-center gap-10 p-8 rounded-lg shadow-md">
-        <div className="flex justify-center items-center p-4">
-          <Image
-            src="/logos/dg_symbol_white.png"
-            alt="Company Logo"
-            width={250}
-            height={250}
-            priority
-          />
-        </div>
-        <div className="flex flex-col items-center sm:items-start gap-6">
-          <input
-            type="text"
-            placeholder="Username"
-            className="w-full sm:w-80 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full sm:w-80 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            className="w-full sm:w-80 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 flex justify-center items-center"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? <LoadingSpinner /> : "Login"}
-          </button>
-        </div>
-      </main>
-      <footer className="text-white text-center mt-8">
-        Copyright © 2024 ManyCoreSoftCo., Ltd.
-      </footer>
+    <div className="h-screen flex flex-col">
+      <header className="flex items-center justify-between p-4 bg-gray-200">
+        <h1 className="text-gray-800 font-bold text-lg">
+          {username ? `${username}` : "Loading..."}
+        </h1>
+        <div>{activeMenu}</div>
+      </header>
+      <div className="flex flex-1">
+        <aside className="w-1/10 p-4 bg-gray-100">
+          <ul>
+            <li
+              className={`cursor-pointer p-2 ${
+                activeMenu === "Settings" ? "bg-gray-300" : ""
+              }`}
+              onClick={() => setActiveMenu("Settings")}
+            >
+              <CogIcon className="inline-block w-5 h-5 mr-2" />
+              Settings
+            </li>
+          </ul>
+        </aside>
+        <main className="w-4/5 p-4 overflow-y-auto">{renderComponent()}</main>
+      </div>
     </div>
   );
 }
