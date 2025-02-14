@@ -48,9 +48,7 @@ export default function Auth() {
   return (
     <div className="h-screen flex flex-col">
       <header className="flex items-center justify-between p-4 bg-gray-200">
-        <h1 className="text-gray-800 font-bold text-lg">
-          {username ? `${username}` : "Loading..."}
-        </h1>
+        <h1 className="text-gray-800 font-bold text-lg">Gadgetini</h1>
         <div>{activeMenu}</div>
       </header>
       <div className="flex flex-1">
