@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ArrowUpIcon, ArrowRightIcon, CheckIcon } from "@heroicons/react/solid";
+import React, { useState, useEffect } from "react";import { ArrowUpIcon, ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "@heroicons/react/solid";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import { fetchLocalIP } from "../utils/fetchLocalIP";
 
@@ -95,14 +94,32 @@ export default function Settings({ nodelist }) {
   };
 
   return (
+   
     <div className="p-4">
-      {/* 네트워크 설정 */}
+      {/* System Configuration Section */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Network Configuration</h2>
-        <p className="mb-2">
-          Current IP :<strong> {localIP} </strong>
-        </p>
-        <div className="flex gap-2 flex-row items-center">
+          <h2 className="text-xl font-bold">System Configuration</h2>
+        <div className="flex gap-2 flex-row items-center mt-4">
+          <div className="flex items-center">
+            <p className="text-base">
+              Current IP :<strong> {localIP}</strong>
+            </p>
+            <div className="border-l h-6 mx-4"></div><a
+  href={`http://${localIP}/dashboard`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center px-4 py-2 text-white rounded-lg transition-all 
+             bg-gradient-to-br from-orange-600 to-yellow-500 hover:from-orange-700 hover:to-yellow-600 shadow-md hover:shadow-lg"
+>
+  Dashboard
+  <ExternalLinkIcon className="w-5 h-5 ml-2" />
+</a>
+
+          </div>
+        </div>
+
+        {/* Set IP Section */}
+        <div className="flex gap-2 flex-row items-center mt-4">
           <span>Set IP :</span>
           <input
             type="text"
@@ -112,7 +129,7 @@ export default function Settings({ nodelist }) {
             className="border p-2 rounded w-48"
           />
           <button
-            onClick={handleIPChange}
+            onClick={() => console.log("Update IP")}
             className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
             disabled={loadingIP}
           >
