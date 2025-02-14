@@ -6,6 +6,7 @@ import LoadingSpinner from "../utils/LoadingSpinner";
 import { FaCheck, FaExternalLinkAlt, FaTimes, FaEdit } from "react-icons/fa";
 import { fetchIPList } from "../utils/fetchIPList";
 import Image from "next/image";
+import { fetchLocalIP } from "../utils/fetchLocalIP";
 
 export default function IPRegister() {
   const [nodelist, setNodelist] = useState([]);
@@ -21,16 +22,6 @@ export default function IPRegister() {
     fetchLocalIP();
     fetchUsername();
   }, []);
-
-  const fetchLocalIP = async () => {
-    try {
-      const response = await fetch("/api/localhostip");
-      const data = await response.json();
-      setLocalIP(data.ipv4);
-    } catch (error) {
-      console.error("Failed to fetch local IP:", error);
-    }
-  };
 
   const fetchUsername = async () => {
     try {
