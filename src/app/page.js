@@ -1,45 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { DocumentAddIcon, CogIcon } from "@heroicons/react/solid";
+import { CogIcon } from "@heroicons/react/solid";
 import IPRegister from "./components/ipregesiter";
 import DisplayControl from "./components/displaycontrol";
 import Settings from "./components/settings";
+import { fetchLocalIP } from "./utils/fetchLocalIP";
 
 export default function Auth() {
-  const [activeMenu, setActiveMenu] = useState("IP Register");
-  const [username, setUsername] = useState("");
-  const router = useRouter();
+  const [activeMenu, setActiveMenu] = useState("Settings");
+  const [localIP, setLocalIP] = useState("localhost");
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-
-    if (!isLoggedIn) {
-      router.push("/");
-    }
-  }, [router]);
-
-  useEffect(() => {
-    async function fetchUsername() {
-      try {
-        const response = await fetch("/api/username");
-        const data = await response.json();
-        setUsername(data.username);
-      } catch (error) {
-        console.error("Failed to fetch username:", error);
-      }
-    }
-
-    fetchUsername();
+    fetchLocalIP().then(setLocalIP);
   }, []);
   const renderComponent = () => {
     switch (activeMenu) {
+      case "Settings":
+        return <Settings />;
       case "IP Register":
         return <IPRegister />;
       case "Display Control":
         return <DisplayControl />;
-      case "Settings":
-        return <Settings />;
       default:
         return <div>Select a menu</div>;
     }
@@ -48,7 +29,10 @@ export default function Auth() {
   return (
     <div className="h-screen flex flex-col">
       <header className="flex items-center justify-between p-4 bg-gray-200">
-        <h1 className="text-gray-800 font-bold text-lg">Gadgetini</h1>
+        <h1 className="text-gray-800 font-bold text-lg">
+          Gadgetini{" "}
+          <span className="text-gray-500 font-semibold text-base">v1.0</span>
+        </h1>
         <div>{activeMenu}</div>
       </header>
       <div className="flex flex-1">
