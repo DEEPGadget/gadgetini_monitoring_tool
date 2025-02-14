@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";import { ArrowUpIcon, ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "@heroicons/react/solid";
+import React, { useState, useEffect } from "react";
+import {
+  ArrowUpIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  ExternalLinkIcon,
+} from "@heroicons/react/solid";
 import LoadingSpinner from "../utils/LoadingSpinner";
 import { fetchLocalIP } from "../utils/fetchLocalIP";
 
@@ -94,26 +100,25 @@ export default function Settings({ nodelist }) {
   };
 
   return (
-   
     <div className="p-4">
       {/* System Configuration Section */}
       <div className="mb-6">
-          <h2 className="text-xl font-bold">System Configuration</h2>
+        <h2 className="text-xl font-bold">System Configuration</h2>
         <div className="flex gap-2 flex-row items-center mt-4">
           <div className="flex items-center">
             <p className="text-base">
               Current IP :<strong> {localIP}</strong>
-            </p><a
-  href={`http://${localIP}/dashboard`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="ml-2 flex items-center px-4 py-2 text-white rounded-lg transition-all 
+            </p>
+            <a
+              href={`http://${localIP}/dashboard`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 flex items-center px-4 py-2 text-white rounded-lg transition-all 
              bg-gradient-to-br from-orange-600 to-yellow-500 hover:from-orange-700 hover:to-yellow-600 shadow-md hover:shadow-lg"
->
-  Dashboard
-  <ExternalLinkIcon className="w-5 h-5 ml-2" />
-</a>
-
+            >
+              Dashboard
+              <ExternalLinkIcon className="w-5 h-5 ml-2" />
+            </a>
           </div>
         </div>
 
@@ -164,31 +169,35 @@ export default function Settings({ nodelist }) {
               </td>
               <td className="py-2 px-4 border border-gray-300 flex justify-center gap-2">
                 <button
-                  onClick={() => setStatus((prevStatus) => ({ 
-  ...prevStatus, 
-  orientation: "vertical" 
-}))}
+                  onClick={() =>
+                    setStatus((prevStatus) => ({
+                      ...prevStatus,
+                      orientation: "vertical",
+                    }))
+                  }
                   className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
                     status.orientation === "vertical"
                       ? "border-2 border-black"
                       : ""
                   }`}
                 >
-                    <ArrowUpIcon className="w-5 h-5 mr-1" />
+                  <ArrowUpIcon className="w-5 h-5 mr-1" />
                   Vertical
                 </button>
                 <button
-                  onClick={() => setStatus((prevStatus) => ({ 
-  ...prevStatus, 
-  orientation: "horizontal" 
-}))}
+                  onClick={() =>
+                    setStatus((prevStatus) => ({
+                      ...prevStatus,
+                      orientation: "horizontal",
+                    }))
+                  }
                   className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
                     status.orientation === "horizontal"
                       ? "border-2 border-black"
                       : ""
                   }`}
                 >
-                    <ArrowRightIcon className="w-5 h-5 mr-1" />
+                  <ArrowRightIcon className="w-5 h-5 mr-1" />
                   Horizontal
                 </button>
               </td>
