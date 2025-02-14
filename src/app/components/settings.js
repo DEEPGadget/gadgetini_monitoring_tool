@@ -103,12 +103,11 @@ export default function Settings({ nodelist }) {
           <div className="flex items-center">
             <p className="text-base">
               Current IP :<strong> {localIP}</strong>
-            </p>
-            <div className="border-l h-6 mx-4"></div><a
+            </p><a
   href={`http://${localIP}/dashboard`}
   target="_blank"
   rel="noopener noreferrer"
-  className="flex items-center px-4 py-2 text-white rounded-lg transition-all 
+  className="ml-2 flex items-center px-4 py-2 text-white rounded-lg transition-all 
              bg-gradient-to-br from-orange-600 to-yellow-500 hover:from-orange-700 hover:to-yellow-600 shadow-md hover:shadow-lg"
 >
   Dashboard
