@@ -6,15 +6,12 @@ import LoadingSpinner from "../utils/LoadingSpinner";
 import { fetchLocalIP } from "../utils/fetchLocalIP";
 
 export default function Settings({ nodelist }) {
-  const [loadingVertical, setLoadingVertical] = useState(false);
-  const [loadingHorizontal, setLoadingHorizontal] = useState(false);
   const [loadingApply, setLoadingApply] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [rotationTime, setRotationTime] = useState(5);
   const [newIP, setNewIP] = useState("");
   const [loadingIP, setLoadingIP] = useState(false);
   const [localIP, setLocalIP] = useState("localhost");
-
+  const [loadingConfig, setLoadingConfig] = useState(true);
   const [status, setStatus] = useState({
     orientation: "vertical",
     cpu: false,
@@ -25,32 +22,36 @@ export default function Settings({ nodelist }) {
   });
 
   useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch("/api/update-config");
+        if (!response.ok) {
+          throw new Error("Failed to fetch config");
+        }
+        const configData = await response.json();
+        console.log(configData);
+        // 상태 업데이트
+        setStatus({
+          orientation: configData.orientation,
+          cpu: configData.cpu,
+          gpu: configData.gpu,
+          psu: configData.psu,
+          network: configData.network,
+          sensors: configData.sensors,
+        });
+        setRotationTime(configData.rotationTime);
+        setOrientation(configData.orientation);
+      } catch (error) {
+        console.error("Error loading config:", error);
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+
+    fetchConfig();
     fetchLocalIP().then(setLocalIP);
   }, []);
 
-  const handleRotation = async (rotationValue, setLoading) => {
-    setLoading(true);
-    const payload = { rotation: rotationValue };
-    try {
-      const response = await fetch("/api/rotation-config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-      } else {
-        console.error("Failed to update rotation");
-      }
-    } catch (error) {
-      console.error("Error applying rotation:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleApply = async () => {
     setLoadingApply(true);
     const payload = { status, rotationTime };
@@ -73,13 +74,6 @@ export default function Settings({ nodelist }) {
     } finally {
       setLoadingApply(false);
     }
-  };
-
-  const setHorizontal = () => {
-    handleRotation("horizontal", setLoadingHorizontal);
-  };
-  const setVertical = () => {
-    handleRotation("vertical", setLoadingVertical);
   };
 
   const toggleStatus = (key) => {
@@ -154,35 +148,31 @@ export default function Settings({ nodelist }) {
               </td>
               <td className="py-2 px-4 border border-gray-300 flex justify-center gap-2">
                 <button
-                  onClick={setVertical}
+                  onClick={() => setStatus((prevStatus) => ({ 
+  ...prevStatus, 
+  orientation: "vertical" 
+}))}
                   className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
                     status.orientation === "vertical"
                       ? "border-2 border-black"
                       : ""
                   }`}
-                  disabled={loadingVertical}
                 >
-                  {loadingVertical ? (
-                    <LoadingSpinner />
-                  ) : (
                     <ArrowUpIcon className="w-5 h-5 mr-1" />
-                  )}
                   Vertical
                 </button>
                 <button
-                  onClick={setHorizontal}
+                  onClick={() => setStatus((prevStatus) => ({ 
+  ...prevStatus, 
+  orientation: "horizontal" 
+}))}
                   className={`flex items-center bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-all ${
                     status.orientation === "horizontal"
                       ? "border-2 border-black"
                       : ""
                   }`}
-                  disabled={loadingHorizontal}
                 >
-                  {loadingHorizontal ? (
-                    <LoadingSpinner />
-                  ) : (
                     <ArrowRightIcon className="w-5 h-5 mr-1" />
-                  )}
                   Horizontal
                 </button>
               </td>

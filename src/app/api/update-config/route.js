@@ -1,83 +1,20 @@
-import { Client } from "ssh2";
-import mysql from "mysql2/promise";
 import fs from "fs";
 import path from "path";
-import dbConfig from "../../utils/dbConfig";
 
 export async function POST(request) {
   try {
     const { status, rotationTime } = await request.json();
 
-    // Fetch node IP addresses and credentials from the database
-    const connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute(
-      "SELECT piusername, piipaddress, pipassword FROM iplists"
-    );
-    await connection.end();
-
-    const updateModes = (
-      piusername,
-      piipaddress,
-      pipassword,
-      status,
-      rotationTime
-    ) => {
-      return new Promise((resolve, reject) => {
-        const conn = new Client();
-        conn
-          .on("ready", () => {
-            // Command to update modes (cpu, gpu, psu, network, sensors) in config.ini
-            const command = `
-        sed -i 's/^cpumode\\s*=\\s*.*/cpumode=${
-          status.cpu ? "on" : "off"
-        }/' ~/config.ini;
-        sed -i 's/^gpumode\\s*=\\s*.*/gpumode=${
-          status.gpu ? "on" : "off"
-        }/' ~/config.ini;
-        sed -i 's/^psumode\\s*=\\s*.*/psumode=${
-          status.psu ? "on" : "off"
-        }/' ~/config.ini;
-        sed -i 's/^networkmode\\s*=\\s*.*/networkmode=${
-          status.network ? "on" : "off"
-        }/' ~/config.ini;
-        sed -i 's/^sensormode\\s*=\\s*.*/sensormode=${
-          status.sensors ? "on" : "off"
-        }/' ~/config.ini;
-        sed -i 's/^time\\s*=\\s*.*/time=${rotationTime}/' ~/config.ini;
-      `;
-
-            // Execute the command on the remote node
-            conn.exec(command, (err) => {
-              if (err) {
-                reject(err);
-                conn.end();
-              } else {
-                resolve(true);
-                conn.end();
-              }
-            });
-          })
-          .on("error", (err) => {
-            reject(err);
-          })
-          .connect({
-            host: piipaddress,
-            port: 22,
-            username: piusername,
-            password: pipassword,
-          });
-      });
-    };
-
     const updateLocalConfig = async (status, rotationTime) => {
       const homeDir = "/home/gadgetini"; // Get home directory
       const configPath = path.join(homeDir, "config.ini"); // Path to config.ini in home directory
-
+      console.log(status.orientation)
       // Read the existing config file
       let config = await fs.promises.readFile(configPath, "utf-8");
 
       // Update the relevant lines in the config file
       config = config
+        .replace(/^orientation\s*=\s*.*/m, `orientation=${status.orientation}`)
         .replace(/^cpumode\s*=\s*.*/m, `cpumode=${status.cpu ? "on" : "off"}`)
         .replace(/^gpumode\s*=\s*.*/m, `gpumode=${status.gpu ? "on" : "off"}`)
         .replace(/^psumode\s*=\s*.*/m, `psumode=${status.psu ? "on" : "off"}`)
@@ -98,19 +35,8 @@ export async function POST(request) {
     // Update the local config file first
     await updateLocalConfig(status, rotationTime);
 
-    // Iterate over each node and update the modes
-    for (const node of rows) {
-      await updateModes(
-        node.piusername,
-        node.piipaddress,
-        node.pipassword,
-        status,
-        rotationTime
-      );
-    }
-
     return new Response(
-      JSON.stringify({ message: "Modes updated on all nodes!" }),
+      JSON.stringify({ message: "Modes updated" }),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -122,5 +48,51 @@ export async function POST(request) {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+export async function GET() {
+  try {
+    const homeDir = "/home/gadgetini"; // config 파일 경로
+    const configPath = path.join(homeDir, "config.ini");
+
+    // 파일 존재 여부 확인
+    if (!fs.existsSync(configPath)) {
+      return new Response(
+        JSON.stringify({ error: "Config file not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 파일 읽기
+    const configContent = await fs.promises.readFile(configPath, "utf-8");
+
+    // 정규식을 이용해 각 설정 값을 추출
+    const getConfigValue = (key) => {
+      const match = configContent.match(new RegExp(`^${key}\\s*=\\s*(.*)`, "m"));
+      return match ? match[1].trim() : null;
+    };
+
+    // JSON 형태로 변환
+    const configData = {
+      orientation: getConfigValue("orientation") || "vertical",
+      cpu: getConfigValue("cpumode") === "on",
+      gpu: getConfigValue("gpumode") === "on",
+      psu: getConfigValue("psumode") === "on",
+      network: getConfigValue("networkmode") === "on",
+      sensors: getConfigValue("sensormode") === "on",
+      rotationTime: parseInt(getConfigValue("time") || "5", 10),
+    };
+
+    return new Response(
+      JSON.stringify(configData),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error reading config:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to read config." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
